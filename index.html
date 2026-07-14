@@ -158,7 +158,7 @@
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
-                        <p class="text-xs text-gray-500 font-semibold uppercase">Total Hadir (Hari ini)</p>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Total Hadir</p>
                         <p id="stat-hadir" class="text-2xl font-bold text-gray-800 mt-1">-</p>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-yellow-500">
@@ -177,7 +177,7 @@
 
                 <!-- Report Filter -->
                 <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Filter Kelas</label>
                             <select id="admin-class" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
@@ -188,9 +188,14 @@
                                 <option value="Kelas 9A">Kelas 9A</option>
                             </select>
                         </div>
+                        <!-- PERUBAHAN: Menambahkan Tanggal Mulai dan Tanggal Sampai -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Filter Tanggal</label>
-                            <input type="date" id="admin-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                            <input type="date" id="admin-start-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Sampai</label>
+                            <input type="date" id="admin-end-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Status Absen</label>
@@ -269,22 +274,23 @@
                 { username: 'admin1', password: '123', role: 'admin', name: 'Admin Pusat' }
             ],
             students: [
-                { id: 'S001', name: 'Ahmad Fauzi', class: 'Kelas A' },
-                { id: 'S002', name: 'Bunga Lestari', class: 'Kelas A' },
-                { id: 'S003', name: 'Citra Kirana', class: 'Kelas A' },
-                { id: 'S004', name: 'Dedi Corbuzier', class: 'Kelas B' },
-                { id: 'S005', name: 'Eka Saputra', class: 'Kelas B' },
-                { id: 'S006', name: 'Fani Halim', class: 'Kelas B' }
+                { id: 'S001', name: 'Ahmad Fauzi', class: 'Kelas 8A' },
+                { id: 'S002', name: 'Bunga Lestari', class: 'Kelas 8A' },
+                { id: 'S003', name: 'Citra Kirana', class: 'Kelas 8A' },
+                { id: 'S004', name: 'Dedi Corbuzier', class: 'Kelas 8B' },
+                { id: 'S005', name: 'Eka Saputra', class: 'Kelas 8B' },
+                { id: 'S006', name: 'Fani Halim', class: 'Kelas 8B' }
             ],
             attendanceRecords: [] // Menyimpan riwayat absensi sementara
         };
 
         // --- Inisialisasi ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Set tanggal default hari ini
+            // Set tanggal default hari ini ke form Guru dan 2 form Admin
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('guru-date').value = today;
-            document.getElementById('admin-date').value = today;
+            document.getElementById('admin-start-date').value = today;
+            document.getElementById('admin-end-date').value = today;
         });
 
         // --- Sistem Navigasi ---
@@ -528,7 +534,10 @@
         // --- Fitur Admin: Muat Laporan ---
         async function loadReport() {
             const className = document.getElementById('admin-class').value;
-            const dateStr = document.getElementById('admin-date').value;
+            // Baca Tanggal Mulai dan Tanggal Sampai
+            const startDate = document.getElementById('admin-start-date').value;
+            const endDate = document.getElementById('admin-end-date').value;
+            
             const statusFilter = document.getElementById('admin-status').value;
             const searchQuery = document.getElementById('admin-search').value.toLowerCase();
             const tbody = document.getElementById('report-table-body');
@@ -541,20 +550,21 @@
                 if (GAS_WEB_APP_URL) {
                     const response = await fetch(GAS_WEB_APP_URL, {
                         method: 'POST',
-                        body: JSON.stringify({ action: 'getReports', className: className, date: dateStr })
+                        // Kirimkan startDate dan endDate ke Backend
+                        body: JSON.stringify({ action: 'getReports', className: className, startDate: startDate, endDate: endDate })
                     });
                     const result = await response.json();
                     records = result.data || [];
                 } else {
-                    // Mock logic
+                    // Mock logic untuk Rentang Tanggal
                     await new Promise(r => setTimeout(r, 500));
                     records = mockData.attendanceRecords;
                     
                     if (className !== 'Semua') {
                         records = records.filter(r => r.className === className);
                     }
-                    if (dateStr) {
-                        records = records.filter(r => r.date === dateStr);
+                    if (startDate && endDate) {
+                        records = records.filter(r => r.date >= startDate && r.date <= endDate);
                     }
                 }
             } catch (error) {
@@ -563,10 +573,10 @@
                 return;
             }
 
-            // Ringkasan Kartu Dashboard tetap mengambil dari total semua data di kelas & tanggal tersebut
+            // Ringkasan Kartu Dashboard
             updateDashboardStats(records);
 
-            // Filter tambahan khusus untuk tabel (berdasarkan dropdown Status dan input Nama Siswa)
+            // Filter tambahan (Status dan Cari Nama)
             let filteredRecords = records;
             
             if (statusFilter !== 'Semua') {
@@ -625,33 +635,33 @@
 
         // --- Fitur Export Sederhana ---
         function exportToCSV() {
-            // Kita kumpulkan data dari tabel yang dirender
             const rows = document.querySelectorAll('#report-table-body tr');
             if (rows.length === 0 || rows[0].cells.length === 1) {
                 showToast('Tidak ada data untuk diekspor', 'error');
                 return;
             }
 
-            // PERBAIKAN: Gunakan %EF%BB%BF (BOM) agar tidak error karakter 
-            // dan gunakan titik koma (;) untuk memisah kolom (standar Excel Indonesia)
             let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BFTanggal;Nama Siswa;Kelas;Status;Keterangan;Guru\n";
             
             rows.forEach(row => {
                 let rowData = [];
                 const cols = row.querySelectorAll('td');
                 cols.forEach(col => {
-                    // Bersihkan teks dari tag span jika ada
                     let text = col.innerText || col.textContent;
                     rowData.push('"' + text.replace(/"/g, '""') + '"');
                 });
-                // Gabungkan baris dengan titik koma
                 csvContent += rowData.join(";") + "\n";
             });
+
+            // Ambil tanggal untuk nama file download
+            const startDate = document.getElementById('admin-start-date').value;
+            const endDate = document.getElementById('admin-end-date').value;
+            const fileName = `Laporan_Absensi_${startDate}_sd_${endDate}.csv`;
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Laporan_Absensi_${document.getElementById('admin-date').value}.csv`);
+            link.setAttribute("download", fileName);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
