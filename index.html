@@ -11,11 +11,18 @@
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .radio-custom:checked + label { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+        
+        /* Custom Radio Button Style */
+        .radio-custom:checked + label {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
     </style>
 </head>
 <body class="text-gray-800">
 
+    <!-- Toast Notification -->
     <div id="toast" class="fixed top-4 right-4 z-50 hidden transform transition-all duration-300">
         <div class="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3">
             <i id="toast-icon" class="fas fa-info-circle"></i>
@@ -23,58 +30,653 @@
         </div>
     </div>
 
+    <!-- MAIN APP CONTAINER -->
     <div id="app" class="min-h-screen">
+
+        <!-- ================= LOGIN PAGE ================= -->
         <div id="login-page" class="flex items-center justify-center min-h-screen p-4 fade-in">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
                 <div class="text-center mb-8">
+                    <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-school text-2xl"></i>
+                    </div>
                     <h1 class="text-2xl font-bold text-gray-900">Portal Absensi Biro</h1>
+                    <p class="text-gray-500 text-sm mt-1">Silakan masuk sesuai peran Anda</p>
                 </div>
+
                 <form id="login-form" class="space-y-5">
-                    <select id="login-role" class="w-full px-4 py-2.5 rounded-lg border border-gray-300">
-                        <option value="guru">Guru Biro</option>
-                        <option value="admin">Administrator</option>
-                    </select>
-                    <input type="text" id="login-username" required placeholder="Username" class="w-full px-4 py-2.5 rounded-lg border border-gray-300">
-                    <input type="password" id="login-password" required placeholder="Password" class="w-full px-4 py-2.5 rounded-lg border border-gray-300">
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">Masuk</button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Peran</label>
+                        <select id="login-role" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                            <option value="guru">Guru Biro</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input type="text" id="login-username" required placeholder="Masukkan username" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                        <p class="text-xs text-gray-400 mt-1">Guru: guru1 | Admin: admin1</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                        <input type="password" id="login-password" required placeholder="Masukkan kata sandi" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                        <p class="text-xs text-gray-400 mt-1">Password: 123</p>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors shadow-md flex justify-center items-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+                    </button>
                 </form>
             </div>
         </div>
 
+        <!-- ================= GURU PAGE (ABSENSI) ================= -->
         <div id="guru-page" class="hidden min-h-screen bg-gray-50 fade-in">
+            <!-- Navbar -->
             <nav class="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-40">
                 <div class="flex items-center space-x-3">
+                    <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
                     <h2 class="font-bold text-lg text-gray-800">Panel Guru</h2>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <!-- Menampilkan Nama Guru dan Mapel -->
-                    <div id="guru-name" class="text-right hidden sm:block">
-                        <span class="text-xs text-gray-400 block" id="guru-mapel-text">-</span>
-                        <span class="font-bold text-gray-700" id="guru-name-text">Nama Guru</span>
-                    </div>
-                    <button onclick="logout()" class="text-red-500 text-sm">Keluar</button>
+                    <span id="guru-name" class="text-sm font-medium text-gray-600 hidden sm:block">Nama Guru</span>
+                    <button onclick="logout()" class="text-red-500 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Keluar
+                    </button>
                 </div>
             </nav>
-            <!-- ... (sisa kode form absen) ... -->
+
+            <div class="max-w-4xl mx-auto p-4 sm:p-6">
+                <!-- Form Filter -->
+                <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Kelas</label>
+                            <select id="guru-class" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="" disabled selected>-- Pilih Kelas --</option>
+                                <option value="Kelas 9A">Kelas 9A</option>
+                                <option value="Kelas 9B">Kelas 9B</option>
+                                <option value="Kelas 9C">Kelas 9C</option>
+                                <option value="Kelas 9D">Kelas 9D</option>
+                                <option value="Kelas 9E">Kelas 9E</option>
+                                <option value="Kelas 9F">Kelas 9F</option>
+                                <option value="Kelas 9G">Kelas 9G</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="guru-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="loadStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-sm">
+                            <i class="fas fa-users mr-1"></i> Tampilkan Siswa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daftar Siswa Container -->
+                <div id="student-list-container" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-800">Daftar Siswa</h3>
+                        <span id="student-count" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0 Siswa</span>
+                    </div>
+                    
+                    <form id="attendance-form">
+                        <div id="students-wrapper" class="space-y-4 mb-6">
+                            <!-- Student rows will be injected here via JS -->
+                        </div>
+                        
+                        <div class="border-t border-gray-100 pt-5">
+                            <button type="submit" class="w-full sm:w-auto sm:float-right bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:-translate-y-0.5">
+                                <i class="fas fa-save mr-2"></i> Simpan Absensi
+                            </button>
+                            <div class="clear-both"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
+
+        <!-- ================= ADMIN PAGE (LAPORAN) ================= -->
+        <div id="admin-page" class="hidden min-h-screen bg-gray-50 fade-in">
+            <!-- Navbar -->
+            <nav class="bg-gray-900 text-white shadow-md px-6 py-4 flex justify-between items-center sticky top-0 z-40">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gray-800 p-2 rounded-lg">
+                        <i class="fas fa-chart-line text-blue-400"></i>
+                    </div>
+                    <h2 class="font-bold text-lg">Dashboard Admin</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="admin-name" class="text-sm font-medium text-gray-300 hidden sm:block">Admin</span>
+                    <button onclick="logout()" class="text-red-400 hover:text-white hover:bg-red-500 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Keluar
+                    </button>
+                </div>
+            </nav>
+
+            <div class="max-w-6xl mx-auto p-4 sm:p-6">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Total Hadir</p>
+                        <p id="stat-hadir" class="text-2xl font-bold text-gray-800 mt-1">-</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-yellow-500">
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Total Izin</p>
+                        <p id="stat-izin" class="text-2xl font-bold text-gray-800 mt-1">-</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-orange-500">
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Total Sakit</p>
+                        <p id="stat-sakit" class="text-2xl font-bold text-gray-800 mt-1">-</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-red-500">
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Total Alpa</p>
+                        <p id="stat-alpa" class="text-2xl font-bold text-gray-800 mt-1">-</p>
+                    </div>
+                </div>
+
+                <!-- Report Filter -->
+                <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Filter Kelas</label>
+                            <select id="admin-class" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                                <option value="Semua">Semua Kelas</option>
+                                <option value="Kelas 8A">Kelas 8A</option>
+                                <option value="Kelas 8B">Kelas 8B</option>
+                                <option value="Kelas 8C">Kelas 8C</option>
+                                <option value="Kelas 8D">Kelas 8D</option>
+                                <option value="Kelas 8E">Kelas 8E</option>
+                                <option value="Kelas 8F">Kelas 8F</option>
+                                <option value="Kelas 8G">Kelas 8G</option>
+                            </select>
+                        </div>
+                        <!-- PERUBAHAN: Menambahkan Tanggal Mulai dan Tanggal Sampai -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                            <input type="date" id="admin-start-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Sampai</label>
+                            <input type="date" id="admin-end-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status Absen</label>
+                            <select id="admin-status" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                                <option value="Semua">Semua Status</option>
+                                <option value="Hadir">Hadir</option>
+                                <option value="Izin">Izin</option>
+                                <option value="Sakit">Sakit</option>
+                                <option value="Alpa">Alpa</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cari Nama</label>
+                            <input type="text" id="admin-search" placeholder="Ketik nama..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                        </div>
+                        <div>
+                            <button onclick="loadReport()" class="w-full bg-gray-900 hover:bg-black text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-sm">
+                                <i class="fas fa-search mr-1"></i> Tampilkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                        <h3 class="font-bold text-gray-800">Tabel Laporan Absensi</h3>
+                        <button onclick="exportToCSV()" class="text-sm bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-md font-medium transition-colors">
+                            <i class="fas fa-file-excel mr-1"></i> Export
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-white text-gray-500 text-xs uppercase border-b border-gray-200">
+                                    <th class="px-6 py-4 font-medium">Tanggal</th>
+                                    <th class="px-6 py-4 font-medium">Nama Siswa</th>
+                                    <th class="px-6 py-4 font-medium">Kelas</th>
+                                    <th class="px-6 py-4 font-medium">Status</th>
+                                    <th class="px-6 py-4 font-medium">Keterangan</th>
+                                    <th class="px-6 py-4 font-medium">Guru</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
+                                <!-- Report rows injected here -->
+                                <tr>
+                                    <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                                        Pilih filter dan klik "Tampilkan Laporan"
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
-        // ... (fungsi lainnya)
+        /**
+         * PENGATURAN GOOGLE APPS SCRIPT (GAS)
+         * Ganti URL di bawah ini dengan URL Web App GAS Anda yang telah di-deploy.
+         * Jika kosong, aplikasi akan berjalan menggunakan mode "Mock" (Simulasi Data Lokal).
+         */
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIe4ZwqJOl01oziSooNlEFUH2zsicl5-YH0tkNwSr87OO980dTM-Q1KmgbhBjbdJDv/exec"; 
+
+        // State Global Aplikasi
+        let currentUser = null;
+        
+        // Mock Data (Digunakan jika GAS_WEB_APP_URL kosong, berguna untuk testing UI)
+        const mockData = {
+            users: [
+                { username: 'guru1', password: '123', role: 'guru', name: 'Bpk. Budi Santoso' },
+                { username: 'admin1', password: '123', role: 'admin', name: 'Admin Pusat' }
+            ],
+            students: [
+                { id: 'S001', name: 'Ahmad Fauzi', class: 'Kelas 8A' },
+                { id: 'S002', name: 'Bunga Lestari', class: 'Kelas 8A' },
+                { id: 'S003', name: 'Citra Kirana', class: 'Kelas 8A' },
+                { id: 'S004', name: 'Dedi Corbuzier', class: 'Kelas 8B' },
+                { id: 'S005', name: 'Eka Saputra', class: 'Kelas 8B' },
+                { id: 'S006', name: 'Fani Halim', class: 'Kelas 8B' }
+            ],
+            attendanceRecords: [] // Menyimpan riwayat absensi sementara
+        };
+
+        // --- Inisialisasi ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set tanggal default hari ini ke form Guru dan 2 form Admin
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('guru-date').value = today;
+            document.getElementById('admin-start-date').value = today;
+            document.getElementById('admin-end-date').value = today;
+        });
+
+        // --- Sistem Navigasi ---
+        function showPage(pageId) {
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('guru-page').classList.add('hidden');
+            document.getElementById('admin-page').classList.add('hidden');
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // --- Notifikasi (Toast) ---
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toast.classList.remove('hidden', 'translate-y-[-100%]', 'opacity-0');
+            toastMsg.textContent = message;
+            
+            // Warna & Ikon berdasarkan tipe
+            if(type === 'success') {
+                toast.querySelector('div').className = 'bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3';
+                toastIcon.className = 'fas fa-check-circle';
+            } else if(type === 'error') {
+                toast.querySelector('div').className = 'bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3';
+                toastIcon.className = 'fas fa-exclamation-circle';
+            } else {
+                toast.querySelector('div').className = 'bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3';
+                toastIcon.className = 'fas fa-info-circle';
+            }
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-100%]');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        // --- Logika Autentikasi ---
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const role = document.getElementById('login-role').value;
+            const user = document.getElementById('login-username').value;
+            const pass = document.getElementById('login-password').value;
+            
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+            btn.disabled = true;
+
+            try {
+                if (GAS_WEB_APP_URL) {
+                    // Panggil API Backend (GAS)
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'login', username: user, password: pass, role: role })
+                    });
+                    const result = await response.json();
+                    
+                    if(result.success) {
+                        currentUser = result.user;
+                        proceedLogin(currentUser);
+                    } else {
+                        showToast(result.message || 'Login gagal', 'error');
+                    }
+                } else {
+                    // Gunakan Data Mocking Lokal
+                    setTimeout(() => {
+                        const foundUser = mockData.users.find(u => u.username === user && u.password === pass && u.role === role);
+                        if (foundUser) {
+                            currentUser = foundUser;
+                            proceedLogin(currentUser);
+                        } else {
+                            showToast('Username, password, atau peran salah!', 'error');
+                        }
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 600); // Simulasi delay jaringan
+                    return;
+                }
+            } catch (error) {
+                showToast('Koneksi bermasalah', 'error');
+                console.error(error);
+            }
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
 
         function proceedLogin(user) {
-            showToast(`Selamat datang, ${user.name}`, 'success');
-            if (user.role === 'guru') {
-                document.getElementById('guru-name-text').textContent = user.name;
-                document.getElementById('guru-mapel-text').textContent = user.mapel || '-';
-                showPage('guru-page');
-            } else {
-                document.getElementById('admin-name').textContent = user.name;
-                showPage('admin-page');
-                loadReport();
-            }
+    showToast(`Selamat datang, ${user.name}`, 'success');
+    if (user.role === 'guru') {
+        // Tampilkan Nama dan Mapel di Panel Guru
+        document.getElementById('guru-name').innerHTML = `
+            <span class="text-xs text-gray-400 block">${user.mapel}</span>
+            <span class="font-bold">${user.name}</span>
+        `;
+        showPage('guru-page');
+    } else {
+        document.getElementById('admin-name').textContent = user.name;
+        showPage('admin-page');
+        loadReport();
+    }
+}
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('login-form').reset();
+            showPage('login-page');
+            showToast('Anda telah keluar', 'info');
         }
-        // ... (fungsi lainnya)
+
+        // --- Fitur Guru: Ambil Data Siswa ---
+        async function loadStudents() {
+            const className = document.getElementById('guru-class').value;
+            const dateStr = document.getElementById('guru-date').value;
+            const container = document.getElementById('student-list-container');
+            const wrapper = document.getElementById('students-wrapper');
+
+            if (!className) {
+                showToast('Silakan pilih kelas terlebih dahulu', 'error');
+                return;
+            }
+
+            wrapper.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Memuat data siswa...</div>';
+            container.classList.remove('hidden');
+
+            let studentList = [];
+
+            if (GAS_WEB_APP_URL) {
+                try {
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'getStudents', className: className, date: dateStr })
+                    });
+                    const res = await response.json();
+                    studentList = res.data || [];
+                } catch (error) {
+                    showToast('Gagal memuat dari server', 'error');
+                    wrapper.innerHTML = '';
+                    return;
+                }
+            } else {
+                // Mock
+                studentList = mockData.students.filter(s => s.class === className);
+                await new Promise(r => setTimeout(r, 400));
+            }
+
+            document.getElementById('student-count').textContent = `${studentList.length} Siswa`;
+            wrapper.innerHTML = '';
+
+            if (studentList.length === 0) {
+                wrapper.innerHTML = '<div class="text-center py-4 text-gray-500">Tidak ada data siswa untuk kelas ini.</div>';
+                return;
+            }
+
+            studentList.forEach((student, index) => {
+                // Cek apakah siswa ini sudah diabsen hari ini (hanya bekerja di mode Mock)
+                const existingRecord = mockData.attendanceRecords.find(r => r.studentId === student.id && r.date === dateStr);
+                const currentStatus = existingRecord ? existingRecord.status : 'Hadir'; // Default Hadir
+                const currentNote = existingRecord ? existingRecord.note : '';
+
+                const html = `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors">
+                    <div class="mb-3 sm:mb-0">
+                        <p class="font-semibold text-gray-800">${student.name}</p>
+                        <p class="text-xs text-gray-500">ID: ${student.id}</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <div class="flex bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                            ${['Hadir', 'Izin', 'Sakit', 'Alpa'].map(status => `
+                                <div class="relative">
+                                    <input type="radio" id="${student.id}-${status}" name="status_${student.id}" value="${status}" class="sr-only radio-custom" ${currentStatus === status ? 'checked' : ''}>
+                                    <label for="${student.id}-${status}" class="cursor-pointer px-3 py-1.5 text-sm font-medium text-gray-600 border-r border-gray-200 hover:bg-gray-50 transition-colors flex items-center justify-center">
+                                        ${status}
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <input type="text" name="note_${student.id}" placeholder="Keterangan (opsional)" value="${currentNote}" class="text-sm px-3 py-1.5 rounded-lg border border-gray-200 focus:ring-1 focus:ring-blue-500 outline-none w-full sm:w-40">
+                        <input type="hidden" name="student_id[]" value="${student.id}">
+                        <input type="hidden" name="student_name_${student.id}" value="${student.name}">
+                    </div>
+                </div>`;
+                wrapper.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // --- Fitur Guru: Simpan Absensi ---
+        document.getElementById('attendance-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const className = document.getElementById('guru-class').value;
+            const dateStr = document.getElementById('guru-date').value;
+            const studentIds = formData.getAll('student_id[]');
+            
+            let attendanceData = [];
+
+            studentIds.forEach(id => {
+                attendanceData.push({
+                    studentId: id,
+                    studentName: formData.get(`student_name_${id}`),
+                    className: className,
+                    date: dateStr,
+                    status: formData.get(`status_${id}`),
+                    note: formData.get(`note_${id}`) || '-',
+                    guru: currentUser.name
+                });
+            });
+
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
+            btn.disabled = true;
+
+            try {
+                if (GAS_WEB_APP_URL) {
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'submitAttendance', data: attendanceData })
+                    });
+                    const result = await response.json();
+                    if(result.success) showToast('Absensi berhasil disimpan!', 'success');
+                    else showToast('Gagal menyimpan absensi', 'error');
+                } else {
+                    // Mock: Simpan ke local array, hapus data lama di tanggal yang sama untuk kelas tersebut
+                    await new Promise(r => setTimeout(r, 600));
+                    
+                    // Filter out existing records for this class and date to overwrite
+                    mockData.attendanceRecords = mockData.attendanceRecords.filter(r => 
+                        !(r.className === className && r.date === dateStr)
+                    );
+                    
+                    // Add new records
+                    mockData.attendanceRecords = [...mockData.attendanceRecords, ...attendanceData];
+                    showToast('Absensi berhasil disimpan! (Mode Lokal)', 'success');
+                }
+            } catch (error) {
+                showToast('Koneksi bermasalah', 'error');
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+
+        // --- Fitur Admin: Muat Laporan ---
+        async function loadReport() {
+            const className = document.getElementById('admin-class').value;
+            // Baca Tanggal Mulai dan Tanggal Sampai
+            const startDate = document.getElementById('admin-start-date').value;
+            const endDate = document.getElementById('admin-end-date').value;
+            
+            const statusFilter = document.getElementById('admin-status').value;
+            const searchQuery = document.getElementById('admin-search').value.toLowerCase();
+            const tbody = document.getElementById('report-table-body');
+
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin text-xl"></i> Memuat data...</td></tr>';
+
+            let records = [];
+
+            try {
+                if (GAS_WEB_APP_URL) {
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        // Kirimkan startDate dan endDate ke Backend
+                        body: JSON.stringify({ action: 'getReports', className: className, startDate: startDate, endDate: endDate })
+                    });
+                    const result = await response.json();
+                    records = result.data || [];
+                } else {
+                    // Mock logic untuk Rentang Tanggal
+                    await new Promise(r => setTimeout(r, 500));
+                    records = mockData.attendanceRecords;
+                    
+                    if (className !== 'Semua') {
+                        records = records.filter(r => r.className === className);
+                    }
+                    if (startDate && endDate) {
+                        records = records.filter(r => r.date >= startDate && r.date <= endDate);
+                    }
+                }
+            } catch (error) {
+                showToast('Gagal mengambil laporan', 'error');
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Gagal mengambil data</td></tr>';
+                return;
+            }
+
+            // Ringkasan Kartu Dashboard
+            updateDashboardStats(records);
+
+            // Filter tambahan (Status dan Cari Nama)
+            let filteredRecords = records;
+            
+            if (statusFilter !== 'Semua') {
+                filteredRecords = filteredRecords.filter(r => r.status === statusFilter);
+            }
+            if (searchQuery.trim() !== '') {
+                filteredRecords = filteredRecords.filter(r => r.studentName.toLowerCase().includes(searchQuery.trim()));
+            }
+
+            renderReportTable(filteredRecords);
+        }
+
+        function renderReportTable(records) {
+            const tbody = document.getElementById('report-table-body');
+            tbody.innerHTML = '';
+
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Tidak ada data absensi ditemukan pada filter ini.</td></tr>';
+                return;
+            }
+
+            records.forEach(r => {
+                let statusBadge = '';
+                switch(r.status) {
+                    case 'Hadir': statusBadge = '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-bold">Hadir</span>'; break;
+                    case 'Izin': statusBadge = '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-md text-xs font-bold">Izin</span>'; break;
+                    case 'Sakit': statusBadge = '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-md text-xs font-bold">Sakit</span>'; break;
+                    case 'Alpa': statusBadge = '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-md text-xs font-bold">Alpa</span>'; break;
+                }
+
+                const html = `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">${r.date}</td>
+                        <td class="px-6 py-4 font-medium text-gray-900">${r.studentName}</td>
+                        <td class="px-6 py-4">${r.className}</td>
+                        <td class="px-6 py-4">${statusBadge}</td>
+                        <td class="px-6 py-4 text-gray-500 text-sm">${r.note}</td>
+                        <td class="px-6 py-4 text-sm">${r.guru}</td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function updateDashboardStats(records) {
+            const counts = { Hadir: 0, Izin: 0, Sakit: 0, Alpa: 0 };
+            records.forEach(r => {
+                if(counts[r.status] !== undefined) counts[r.status]++;
+            });
+
+            document.getElementById('stat-hadir').textContent = counts.Hadir;
+            document.getElementById('stat-izin').textContent = counts.Izin;
+            document.getElementById('stat-sakit').textContent = counts.Sakit;
+            document.getElementById('stat-alpa').textContent = counts.Alpa;
+        }
+
+        // --- Fitur Export Sederhana ---
+        function exportToCSV() {
+            const rows = document.querySelectorAll('#report-table-body tr');
+            if (rows.length === 0 || rows[0].cells.length === 1) {
+                showToast('Tidak ada data untuk diekspor', 'error');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BFTanggal;Nama Siswa;Kelas;Status;Keterangan;Guru\n";
+            
+            rows.forEach(row => {
+                let rowData = [];
+                const cols = row.querySelectorAll('td');
+                cols.forEach(col => {
+                    let text = col.innerText || col.textContent;
+                    rowData.push('"' + text.replace(/"/g, '""') + '"');
+                });
+                csvContent += rowData.join(";") + "\n";
+            });
+
+            // Ambil tanggal untuk nama file download
+            const startDate = document.getElementById('admin-start-date').value;
+            const endDate = document.getElementById('admin-end-date').value;
+            const fileName = `Laporan_Absensi_${startDate}_sd_${endDate}.csv`;
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Berhasil mengunduh laporan', 'success');
+        }
     </script>
 </body>
 </html>
