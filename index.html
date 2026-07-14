@@ -386,16 +386,20 @@
         });
 
         function proceedLogin(user) {
-            showToast(`Selamat datang, ${user.name}`, 'success');
-            if (user.role === 'guru') {
-                document.getElementById('guru-name').textContent = user.name;
-                showPage('guru-page');
-            } else {
-                document.getElementById('admin-name').textContent = user.name;
-                showPage('admin-page');
-                loadReport(); // Load data awal
-            }
-        }
+    showToast(`Selamat datang, ${user.name}`, 'success');
+    if (user.role === 'guru') {
+        // Tampilkan Nama dan Mapel di Panel Guru
+        document.getElementById('guru-name').innerHTML = `
+            <span class="text-xs text-gray-400 block">${user.mapel}</span>
+            <span class="font-bold">${user.name}</span>
+        `;
+        showPage('guru-page');
+    } else {
+        document.getElementById('admin-name').textContent = user.name;
+        showPage('admin-page');
+        loadReport();
+    }
+}
 
         function logout() {
             currentUser = null;
