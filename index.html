@@ -177,8 +177,8 @@
 
                 <!-- Report Filter -->
                 <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
-                    <div class="flex flex-col sm:flex-row gap-4 items-end">
-                        <div class="w-full sm:w-1/3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Filter Kelas</label>
                             <select id="admin-class" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
                                 <option value="Semua">Semua Kelas</option>
@@ -188,13 +188,27 @@
                                 <option value="Kelas 9A">Kelas 9A</option>
                             </select>
                         </div>
-                        <div class="w-full sm:w-1/3">
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Filter Tanggal</label>
                             <input type="date" id="admin-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
                         </div>
-                        <div class="w-full sm:w-1/3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status Absen</label>
+                            <select id="admin-status" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                                <option value="Semua">Semua Status</option>
+                                <option value="Hadir">Hadir</option>
+                                <option value="Izin">Izin</option>
+                                <option value="Sakit">Sakit</option>
+                                <option value="Alpa">Alpa</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cari Nama</label>
+                            <input type="text" id="admin-search" placeholder="Ketik nama..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                        </div>
+                        <div>
                             <button onclick="loadReport()" class="w-full bg-gray-900 hover:bg-black text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-sm">
-                                <i class="fas fa-search mr-1"></i> Tampilkan Laporan
+                                <i class="fas fa-search mr-1"></i> Tampilkan
                             </button>
                         </div>
                     </div>
@@ -515,6 +529,8 @@
         async function loadReport() {
             const className = document.getElementById('admin-class').value;
             const dateStr = document.getElementById('admin-date').value;
+            const statusFilter = document.getElementById('admin-status').value;
+            const searchQuery = document.getElementById('admin-search').value.toLowerCase();
             const tbody = document.getElementById('report-table-body');
 
             tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin text-xl"></i> Memuat data...</td></tr>';
@@ -547,8 +563,20 @@
                 return;
             }
 
-            renderReportTable(records);
+            // Ringkasan Kartu Dashboard tetap mengambil dari total semua data di kelas & tanggal tersebut
             updateDashboardStats(records);
+
+            // Filter tambahan khusus untuk tabel (berdasarkan dropdown Status dan input Nama Siswa)
+            let filteredRecords = records;
+            
+            if (statusFilter !== 'Semua') {
+                filteredRecords = filteredRecords.filter(r => r.status === statusFilter);
+            }
+            if (searchQuery.trim() !== '') {
+                filteredRecords = filteredRecords.filter(r => r.studentName.toLowerCase().includes(searchQuery.trim()));
+            }
+
+            renderReportTable(filteredRecords);
         }
 
         function renderReportTable(records) {
@@ -604,17 +632,20 @@
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,Tanggal,Nama Siswa,Kelas,Status,Keterangan,Guru\n";
+            // PERBAIKAN: Gunakan %EF%BB%BF (BOM) agar tidak error karakter 
+            // dan gunakan titik koma (;) untuk memisah kolom (standar Excel Indonesia)
+            let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BFTanggal;Nama Siswa;Kelas;Status;Keterangan;Guru\n";
             
             rows.forEach(row => {
                 let rowData = [];
                 const cols = row.querySelectorAll('td');
                 cols.forEach(col => {
-                    // Clean text (remove span tags if any)
+                    // Bersihkan teks dari tag span jika ada
                     let text = col.innerText || col.textContent;
                     rowData.push('"' + text.replace(/"/g, '""') + '"');
                 });
-                csvContent += rowData.join(",") + "\n";
+                // Gabungkan baris dengan titik koma
+                csvContent += rowData.join(";") + "\n";
             });
 
             const encodedUri = encodeURI(csvContent);
