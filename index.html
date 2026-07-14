@@ -127,7 +127,12 @@
                 <div id="student-list-container" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
                         <h3 class="font-bold text-gray-800">Daftar Siswa</h3>
-                        <span id="student-count" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0 Siswa</span>
+                        <div class="flex items-center space-x-3">
+                            <button type="button" onclick="setAllToAlpa()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
+                                <i class="fas fa-times-circle mr-1"></i> Set Semua Alpa
+                            </button>
+                            <span id="student-count" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0 Siswa</span>
+                        </div>
                     </div>
                     
                     <form id="attendance-form">
@@ -400,20 +405,20 @@
         });
 
         function proceedLogin(user) {
-    showToast(`Selamat datang, ${user.name}`, 'success');
-    if (user.role === 'guru') {
-        // Tampilkan Nama dan Mapel di Panel Guru
-        document.getElementById('guru-name').innerHTML = `
-            <span class="text-xs text-gray-400 block">${user.mapel}</span>
-            <span class="font-bold">${user.name}</span>
-        `;
-        showPage('guru-page');
-    } else {
-        document.getElementById('admin-name').textContent = user.name;
-        showPage('admin-page');
-        loadReport();
-    }
-}
+            showToast(`Selamat datang, ${user.name}`, 'success');
+            if (user.role === 'guru') {
+                // Tampilkan Nama dan Mapel di Panel Guru
+                document.getElementById('guru-name').innerHTML = `
+                    <span class="text-xs text-gray-400 block">${user.mapel}</span>
+                    <span class="font-bold">${user.name}</span>
+                `;
+                showPage('guru-page');
+            } else {
+                document.getElementById('admin-name').textContent = user.name;
+                showPage('admin-page');
+                loadReport();
+            }
+        }
 
         function logout() {
             currentUser = null;
@@ -496,6 +501,17 @@
                 </div>`;
                 wrapper.insertAdjacentHTML('beforeend', html);
             });
+        }
+
+        // --- Fitur Guru: Set Semua Alpa ---
+        function setAllToAlpa() {
+            const radios = document.querySelectorAll('input[type="radio"][value="Alpa"]');
+            if (radios.length === 0) {
+                showToast('Belum ada data siswa yang ditampilkan', 'error');
+                return;
+            }
+            radios.forEach(radio => radio.checked = true);
+            showToast('Semua status diubah ke Alpa', 'info');
         }
 
         // --- Fitur Guru: Simpan Absensi ---
