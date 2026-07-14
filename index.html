@@ -128,9 +128,6 @@
                     <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
                         <h3 class="font-bold text-gray-800">Daftar Siswa</h3>
                         <div class="flex items-center space-x-3">
-                            <button type="button" onclick="setAllToAlpa()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
-                                <i class="fas fa-times-circle mr-1"></i> Set Semua Alpa
-                            </button>
                             <span id="student-count" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0 Siswa</span>
                         </div>
                     </div>
@@ -474,7 +471,7 @@
             studentList.forEach((student, index) => {
                 // Cek apakah siswa ini sudah diabsen hari ini (hanya bekerja di mode Mock)
                 const existingRecord = mockData.attendanceRecords.find(r => r.studentId === student.id && r.date === dateStr);
-                const currentStatus = existingRecord ? existingRecord.status : 'Hadir'; // Default Hadir
+                const currentStatus = existingRecord ? existingRecord.status : 'Alpa'; // Default sekarang adalah Alpa
                 const currentNote = existingRecord ? existingRecord.note : '';
 
                 const html = `
@@ -501,17 +498,6 @@
                 </div>`;
                 wrapper.insertAdjacentHTML('beforeend', html);
             });
-        }
-
-        // --- Fitur Guru: Set Semua Alpa ---
-        function setAllToAlpa() {
-            const radios = document.querySelectorAll('input[type="radio"][value="Alpa"]');
-            if (radios.length === 0) {
-                showToast('Belum ada data siswa yang ditampilkan', 'error');
-                return;
-            }
-            radios.forEach(radio => radio.checked = true);
-            showToast('Semua status diubah ke Alpa', 'info');
         }
 
         // --- Fitur Guru: Simpan Absensi ---
