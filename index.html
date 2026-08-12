@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Absensi Biro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -284,7 +285,9 @@
          * Ganti URL di bawah ini dengan URL Web App GAS Anda yang telah di-deploy.
          * Jika kosong, aplikasi akan berjalan menggunakan mode "Mock" (Simulasi Data Lokal).
          */
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIe4ZwqJOl01oziSooNlEFUH2zsicl5-YH0tkNwSr87OO980dTM-Q1KmgbhBjbdJDv/exec"; 
+        const SUPABASE_URL = "https://ujbiawpaxdgrmgkznkef.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqYmlhd3BheGRncm1na3pua2VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MjkxMzQsImV4cCI6MjEwMjEwNTEzNH0.n6YzZlZLFQ-zG1mGeCtFJdyzVMAyxiu-6cqBioZPcMU";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // State Global Aplikasi
         let currentUser = null;
