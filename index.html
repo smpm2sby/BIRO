@@ -133,9 +133,23 @@
                 </div>
 
                 <div id="student-list-container" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
-                        <h3 class="font-bold text-gray-800">Daftar Siswa</h3>
-                        <span id="student-count" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0 Siswa</span>
+                    <!-- HEADER DAFTAR SISWA: SEARCH BAR & TOMBOL SEMUA HADIR -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-gray-100">
+                        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
+                            <h3 class="font-bold text-gray-800">Daftar Siswa</h3>
+                            <span id="student-count" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0 Siswa</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                            <!-- SEARCH BAR SISWA -->
+                            <div class="relative flex-1 sm:w-48">
+                                <input type="text" id="guru-search-student" oninput="filterStudentList()" placeholder="Cari nama siswa..." class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
+                                <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+                            </div>
+                            <!-- TOMBOL SEMUA HADIR -->
+                            <button type="button" onclick="setAllAttendance('Hadir')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center shadow-sm">
+                                <i class="fas fa-check-double mr-1.5"></i> Semua Hadir
+                            </button>
+                        </div>
                     </div>
                     
                     <form id="attendance-form">
@@ -286,7 +300,7 @@
 
     </div>
 
-    <!-- ================= JAVASCRIPT LOGIC (SUPABASE INTEGRATED) ================= -->
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         const SUPABASE_URL = "https://ujbiawpaxdgrmgkznkef.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqYmlhd3BheGRncm1na3pua2VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MjkxMzQsImV4cCI6MjEwMjEwNTEzNH0.n6YzZlZLFQ-zG1mGeCtFJdyzVMAyxiu-6cqBioZPcMU";
@@ -332,6 +346,29 @@
                 toast.classList.add('opacity-0', 'translate-y-[-100%]');
                 setTimeout(() => toast.classList.add('hidden'), 300);
             }, 3000);
+        }
+
+        // --- FITUR GURU: UBAH SEMUA STATUS KE HADIR ---
+        function setAllAttendance(status) {
+            const wrapper = document.getElementById('students-wrapper');
+            if (!wrapper) return;
+            const radios = wrapper.querySelectorAll(`input[type="radio"][value="${status}"]`);
+            radios.forEach(radio => radio.checked = true);
+            showToast(`Semua siswa di-set ${status}`, 'info');
+        }
+
+        // --- FITUR GURU: FILTER NAMA SISWA ---
+        function filterStudentList() {
+            const query = document.getElementById('guru-search-student').value.toLowerCase();
+            const rows = document.querySelectorAll('#students-wrapper .student-row');
+            rows.forEach(row => {
+                const name = row.getAttribute('data-student-name') || '';
+                if (name.toLowerCase().includes(query)) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
         }
 
         // --- PROSES LOGIN ---
@@ -404,6 +441,10 @@
                 return;
             }
 
+            // Reset input pencarian saat kelas baru dibuka
+            const searchInput = document.getElementById('guru-search-student');
+            if(searchInput) searchInput.value = '';
+
             wrapper.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Memuat data siswa...</div>';
             container.classList.remove('hidden');
 
@@ -439,11 +480,12 @@
 
                 studentList.forEach((student) => {
                     const record = attendanceMap[student.id];
-                    const currentStatus = record ? record.status : 'Hadir'; // Default radio diset ke Hadir jika belum diabsen
+                    // DEFAULT DISAPLIKASIKAN KE 'Alpa' JIKA BELUM DIABSEN
+                    const currentStatus = record ? record.status : 'Alpa';
                     const currentNote = record ? (record.note || '') : '';
 
                     const html = `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors">
+                    <div class="student-row flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors" data-student-name="${student.name}">
                         <div class="mb-3 sm:mb-0">
                             <p class="font-semibold text-gray-800">${student.name}</p>
                             <p class="text-xs text-gray-500">ID: ${student.id}</p>
