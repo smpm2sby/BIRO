@@ -90,10 +90,10 @@
 
             <div class="max-w-4xl mx-auto p-4 sm:p-6">
                 <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Kelas</label>
-                            <select id="guru-class" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <select id="guru-class" class="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="" disabled selected>-- Pilih Kelas --</option>
                                 <!-- KELAS 7 -->
                                 <option value="Kelas 7A">Kelas 7A</option>
@@ -121,25 +121,119 @@
                             </select>
                         </div>
                         
-                        <!-- CARD TANGGAL BERGAYA PREMIUM SEPERTI DI VIDEO -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Absensi</label>
-                            <div class="relative flex items-center bg-gray-50 border border-gray-300 rounded-lg p-2.5 hover:border-blue-500 transition-colors cursor-pointer shadow-sm">
-                                <div class="bg-blue-100 text-blue-600 p-2 rounded-md mr-3 flex items-center justify-center">
-                                    <i class="far fa-calendar-alt text-base"></i>
+                        <!-- PREMIUM DATE & TIME PICKER (Sesuai image_be26f3.png) -->
+                        <div class="relative">
+                            <!-- Floating Pill Label -->
+                            <div class="absolute -top-3 left-4 bg-white px-2.5 py-0.5 rounded-full border border-indigo-400 z-10 shadow-sm">
+                                <span class="text-xs font-semibold text-indigo-600">Date & Time</span>
+                            </div>
+
+                            <!-- Trigger Card -->
+                            <div onclick="toggleDateTimePicker()" class="flex items-center justify-between bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl px-4 py-2.5 cursor-pointer shadow-sm transition-all">
+                                <div class="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm font-semibold text-gray-800">
+                                    <i class="far fa-calendar text-indigo-600"></i>
+                                    <span id="guru-date-display-str">Aug 04, 2026</span>
+                                    <span class="text-gray-300 font-light">|</span>
+                                    <i class="far fa-clock text-indigo-600"></i>
+                                    <span id="guru-time-display-str">06 : 00 PM</span>
                                 </div>
-                                <div class="flex-1">
-                                    <span class="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">Date & Time</span>
-                                    <span id="guru-date-display" class="font-bold text-gray-800 text-sm">May 01, 2026</span>
+                                <div class="text-indigo-600 pl-2">
+                                    <i class="fas fa-calendar-alt text-lg"></i>
                                 </div>
-                                <i class="fas fa-calendar-day text-blue-500 text-sm ml-2"></i>
-                                <!-- Hidden Date Input -->
-                                <input type="date" id="guru-date" onchange="updateGuruDateDisplay()" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                            </div>
+
+                            <!-- Hidden Inputs untuk Integrasi System -->
+                            <input type="hidden" id="guru-date" name="guru_date">
+                            <input type="hidden" id="guru-time" name="guru_time">
+
+                            <!-- POPUP PICKER MODAL (Sesuai Layout Gambar) -->
+                            <div id="custom-datetime-picker" class="hidden absolute top-full right-0 mt-3 z-50 bg-gray-100 rounded-3xl p-5 shadow-2xl border border-gray-200 w-full sm:w-[560px] fade-in">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                                    
+                                    <!-- KALENDER (7 Cols) -->
+                                    <div class="md:col-span-7 bg-white/70 p-3 rounded-2xl shadow-inner">
+                                        <!-- Navigasi Bulan & Tahun -->
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button type="button" onclick="changePickerMonth(-1)" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </button>
+                                            
+                                            <div class="flex items-center space-x-1.5">
+                                                <select id="picker-month" onchange="renderPickerCalendar()" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1.5 rounded-lg outline-none cursor-pointer">
+                                                </select>
+                                                <select id="picker-year" onchange="renderPickerCalendar()" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1.5 rounded-lg outline-none cursor-pointer">
+                                                </select>
+                                            </div>
+
+                                            <button type="button" onclick="changePickerMonth(1)" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Nama Hari -->
+                                        <div class="grid grid-cols-7 text-center font-bold text-xs text-gray-500 mb-2">
+                                            <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                                        </div>
+
+                                        <!-- Grid Tanggal -->
+                                        <div id="picker-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs">
+                                        </div>
+                                    </div>
+
+                                    <!-- BAGIAN JAM & TOMBOL (5 Cols) -->
+                                    <div class="md:col-span-5 flex flex-col justify-between space-y-4">
+                                        <div>
+                                            <h4 class="font-bold text-gray-800 text-sm mb-2">Time</h4>
+                                            
+                                            <div class="grid grid-cols-3 text-center text-[10px] font-semibold text-gray-500 mb-1">
+                                                <div>Hour</div>
+                                                <div>Minute</div>
+                                                <div>AM / PM</div>
+                                            </div>
+
+                                            <div class="grid grid-cols-3 gap-1.5 items-center">
+                                                <!-- Spinner Jam -->
+                                                <div class="flex flex-col items-center space-y-1">
+                                                    <button type="button" onclick="adjustPickerTime('hour', 1)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
+                                                    <div id="picker-hour-val" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">06</div>
+                                                    <button type="button" onclick="adjustPickerTime('hour', -1)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
+                                                </div>
+
+                                                <!-- Spinner Menit -->
+                                                <div class="flex flex-col items-center space-y-1">
+                                                    <button type="button" onclick="adjustPickerTime('minute', 5)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
+                                                    <div id="picker-minute-val" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">00</div>
+                                                    <button type="button" onclick="adjustPickerTime('minute', -5)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
+                                                </div>
+
+                                                <!-- Spinner AM/PM -->
+                                                <div class="flex flex-col items-center space-y-1">
+                                                    <button type="button" onclick="togglePickerAmpm()" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
+                                                    <div id="picker-ampm-val" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">PM</div>
+                                                    <button type="button" onclick="togglePickerAmpm()" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tombol Pintas Today & Now -->
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button type="button" onclick="setPickerToday()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Today</button>
+                                            <button type="button" onclick="setPickerNow()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Now</button>
+                                        </div>
+
+                                        <!-- Tombol Done -->
+                                        <button type="button" onclick="applyDateTimePicker()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl text-sm transition-colors shadow-md">
+                                            Done
+                                        </button>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="mt-4 flex justify-end">
-                        <button onclick="loadStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-sm">
+                        <button onclick="loadStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-sm">
                             <i class="fas fa-users mr-1"></i> Tampilkan Siswa
                         </button>
                     </div>
@@ -322,41 +416,203 @@
 
         let currentUser = null;
 
-        // FORMAT TANGGAL SEPERTI PADA VIDEO (e.g. Sep 01, 2026 / May 01, 2026)
-        function formatDateToVideoStyle(dateStr) {
-            if (!dateStr) return "-";
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return dateStr;
+        // --- STATE UNTUK CUSTOM DATE & TIME PICKER ---
+        const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        let pickerState = {
+            year: 2026,
+            month: 7, // August (0-indexed)
+            day: 4,
+            hour: 6,
+            minute: 0,
+            ampm: 'PM'
+        };
+
+        function initDateTimePicker() {
+            const now = new Date();
+            pickerState.year = now.getFullYear();
+            pickerState.month = now.getMonth();
+            pickerState.day = now.getDate();
             
-            const year = parts[0];
-            const monthIdx = parseInt(parts[1], 10) - 1;
-            const day = parts[2];
-            
-            const monthNames = [
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                "Jul", "Sep", "Sep", "Oct", "Nov", "Dec"
-            ];
-            
-            return `${monthNames[monthIdx] || 'Jan'} ${day}, ${year}`;
+            let hours = now.getHours();
+            pickerState.ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            pickerState.hour = hours ? hours : 12;
+            pickerState.minute = Math.floor(now.getMinutes() / 5) * 5;
+
+            populatePickerDropdowns();
+            renderPickerCalendar();
+            updatePickerTimeUI();
+            applyDateTimePicker(false);
         }
 
-        // UPDATE TAMPILAN CARD TANGGAL
-        function updateGuruDateDisplay() {
-            const val = document.getElementById('guru-date').value;
-            const displayEl = document.getElementById('guru-date-display');
-            if (displayEl && val) {
-                displayEl.textContent = formatDateToVideoStyle(val);
+        function toggleDateTimePicker() {
+            const picker = document.getElementById('custom-datetime-picker');
+            if(picker) picker.classList.toggle('hidden');
+        }
+
+        function populatePickerDropdowns() {
+            const mSelect = document.getElementById('picker-month');
+            const ySelect = document.getElementById('picker-year');
+
+            if (mSelect) {
+                mSelect.innerHTML = monthNamesFull.map((m, idx) => 
+                    `<option value="${idx}" ${idx === pickerState.month ? 'selected' : ''}>${m}</option>`
+                ).join('');
+            }
+
+            if (ySelect) {
+                let years = [];
+                for (let y = 2020; y <= 2035; y++) {
+                    years.push(`<option value="${y}" ${y === pickerState.year ? 'selected' : ''}>${y}</option>`);
+                }
+                ySelect.innerHTML = years.join('');
+            }
+        }
+
+        function renderPickerCalendar() {
+            const mSelect = document.getElementById('picker-month');
+            const ySelect = document.getElementById('picker-year');
+            if (mSelect) pickerState.month = parseInt(mSelect.value, 10);
+            if (ySelect) pickerState.year = parseInt(ySelect.value, 10);
+
+            const grid = document.getElementById('picker-days-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const firstDayIdx = new Date(pickerState.year, pickerState.month, 1).getDay();
+            const totalDays = new Date(pickerState.year, pickerState.month + 1, 0).getDate();
+            const prevTotalDays = new Date(pickerState.year, pickerState.month, 0).getDate();
+
+            // Padding bulan sebelumnya
+            for (let x = firstDayIdx; x > 0; x--) {
+                const dayNum = prevTotalDays - x + 1;
+                grid.innerHTML += `<div class="py-2 text-gray-300 font-light flex items-center justify-center">${dayNum}</div>`;
+            }
+
+            // Tanggal bulan aktif
+            for (let i = 1; i <= totalDays; i++) {
+                const isSelected = (i === pickerState.day);
+                const btnClass = isSelected
+                    ? "bg-indigo-600 text-white font-bold rounded-xl shadow-md"
+                    : "text-gray-700 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer";
+
+                grid.innerHTML += `
+                    <div onclick="selectPickerDay(${i})" class="py-2 flex items-center justify-center font-medium ${btnClass}">
+                        ${i}
+                    </div>
+                `;
+            }
+        }
+
+        function selectPickerDay(day) {
+            pickerState.day = day;
+            renderPickerCalendar();
+        }
+
+        function changePickerMonth(delta) {
+            pickerState.month += delta;
+            if (pickerState.month < 0) {
+                pickerState.month = 11;
+                pickerState.year--;
+            } else if (pickerState.month > 11) {
+                pickerState.month = 0;
+                pickerState.year++;
+            }
+            populatePickerDropdowns();
+            renderPickerCalendar();
+        }
+
+        function adjustPickerTime(unit, delta) {
+            if (unit === 'hour') {
+                pickerState.hour += delta;
+                if (pickerState.hour > 12) pickerState.hour = 1;
+                if (pickerState.hour < 1) pickerState.hour = 12;
+            } else if (unit === 'minute') {
+                pickerState.minute += delta;
+                if (pickerState.minute >= 60) pickerState.minute = 0;
+                if (pickerState.minute < 0) pickerState.minute = 55;
+            }
+            updatePickerTimeUI();
+        }
+
+        function togglePickerAmpm() {
+            pickerState.ampm = pickerState.ampm === 'AM' ? 'PM' : 'AM';
+            updatePickerTimeUI();
+        }
+
+        function updatePickerTimeUI() {
+            const hEl = document.getElementById('picker-hour-val');
+            const mEl = document.getElementById('picker-minute-val');
+            const aEl = document.getElementById('picker-ampm-val');
+
+            if (hEl) hEl.textContent = String(pickerState.hour).padStart(2, '0');
+            if (mEl) mEl.textContent = String(pickerState.minute).padStart(2, '0');
+            if (aEl) aEl.textContent = pickerState.ampm;
+        }
+
+        function setPickerToday() {
+            const now = new Date();
+            pickerState.year = now.getFullYear();
+            pickerState.month = now.getMonth();
+            pickerState.day = now.getDate();
+            populatePickerDropdowns();
+            renderPickerCalendar();
+        }
+
+        function setPickerNow() {
+            setPickerToday();
+            const now = new Date();
+            let hours = now.getHours();
+            pickerState.ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            pickerState.hour = hours ? hours : 12;
+            pickerState.minute = Math.floor(now.getMinutes() / 5) * 5;
+            updatePickerTimeUI();
+        }
+
+        function applyDateTimePicker(close = true) {
+            // ISO YYYY-MM-DD
+            const mStr = String(pickerState.month + 1).padStart(2, '0');
+            const dStr = String(pickerState.day).padStart(2, '0');
+            const dateISO = `${pickerState.year}-${mStr}-${dStr}`;
+
+            // 24H Time Format
+            let h24 = pickerState.hour;
+            if (pickerState.ampm === 'PM' && h24 < 12) h24 += 12;
+            if (pickerState.ampm === 'AM' && h24 === 12) h24 = 0;
+            const timeISO = `${String(h24).padStart(2, '0')}:${String(pickerState.minute).padStart(2, '0')}`;
+
+            // Assign Hidden Inputs
+            const dateInput = document.getElementById('guru-date');
+            const timeInput = document.getElementById('guru-time');
+            if (dateInput) dateInput.value = dateISO;
+            if (timeInput) timeInput.value = timeISO;
+
+            // Format Display String: Aug 04, 2026 | 06 : 00 PM
+            const mShort = monthNamesShort[pickerState.month];
+            const dateDisplayStr = `${mShort} ${dStr}, ${pickerState.year}`;
+            const timeDisplayStr = `${String(pickerState.hour).padStart(2, '0')} : ${String(pickerState.minute).padStart(2, '0')} ${pickerState.ampm}`;
+
+            const dateLabel = document.getElementById('guru-date-display-str');
+            const timeLabel = document.getElementById('guru-time-display-str');
+            if (dateLabel) dateLabel.textContent = dateDisplayStr;
+            if (timeLabel) timeLabel.textContent = timeDisplayStr;
+
+            if (close) {
+                const picker = document.getElementById('custom-datetime-picker');
+                if (picker) picker.classList.add('hidden');
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('guru-date').value = today;
             document.getElementById('admin-start-date').value = today;
             document.getElementById('admin-end-date').value = today;
             
-            // Inisialisasi Tampilan Tanggal
-            updateGuruDateDisplay();
+            // Inisialisasi Custom Date Time Picker
+            initDateTimePicker();
         });
 
         function showPage(pageId) {
