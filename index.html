@@ -65,7 +65,7 @@
                         <input type="password" id="login-password" required placeholder="Masukkan kata sandi" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                     </div>
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors shadow-md flex justify-center items-center">
-                        <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+                        <i class="fas fa-sign-out-alt mr-2"></i> Masuk
                     </button>
                 </form>
             </div>
@@ -121,15 +121,13 @@
                             </select>
                         </div>
                         
-                        <!-- PREMIUM DATE & TIME PICKER (Sesuai image_be26f3.png) -->
+                        <!-- PREMIUM DATE & TIME PICKER (GURU) -->
                         <div class="relative">
-                            <!-- Floating Pill Label -->
                             <div class="absolute -top-3 left-4 bg-white px-2.5 py-0.5 rounded-full border border-indigo-400 z-10 shadow-sm">
                                 <span class="text-xs font-semibold text-indigo-600">Date & Time</span>
                             </div>
 
-                            <!-- Trigger Card -->
-                            <div onclick="toggleDateTimePicker()" class="flex items-center justify-between bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl px-4 py-2.5 cursor-pointer shadow-sm transition-all">
+                            <div onclick="togglePicker('guru')" class="flex items-center justify-between bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-2xl px-4 py-2.5 cursor-pointer shadow-sm transition-all">
                                 <div class="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm font-semibold text-gray-800">
                                     <i class="far fa-calendar text-indigo-600"></i>
                                     <span id="guru-date-display-str">Aug 04, 2026</span>
@@ -142,45 +140,41 @@
                                 </div>
                             </div>
 
-                            <!-- Hidden Inputs untuk Integrasi System -->
                             <input type="hidden" id="guru-date" name="guru_date">
                             <input type="hidden" id="guru-time" name="guru_time">
 
-                            <!-- POPUP PICKER MODAL (Sesuai Layout Gambar) -->
-                            <div id="custom-datetime-picker" class="hidden absolute top-full right-0 mt-3 z-50 bg-gray-100 rounded-3xl p-5 shadow-2xl border border-gray-200 w-full sm:w-[560px] fade-in">
+                            <!-- POPUP PICKER MODAL (GURU) -->
+                            <div id="picker-modal-guru" class="hidden absolute top-full right-0 mt-3 z-50 bg-gray-100 rounded-3xl p-5 shadow-2xl border border-gray-200 w-full sm:w-[560px] fade-in">
                                 <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
                                     
-                                    <!-- KALENDER (7 Cols) -->
+                                    <!-- KALENDER -->
                                     <div class="md:col-span-7 bg-white/70 p-3 rounded-2xl shadow-inner">
-                                        <!-- Navigasi Bulan & Tahun -->
                                         <div class="flex items-center justify-between mb-3">
-                                            <button type="button" onclick="changePickerMonth(-1)" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                            <button type="button" onclick="changePickerMonth('guru', -1)" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
                                                 <i class="fas fa-chevron-left"></i>
                                             </button>
                                             
                                             <div class="flex items-center space-x-1.5">
-                                                <select id="picker-month" onchange="renderPickerCalendar()" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1.5 rounded-lg outline-none cursor-pointer">
+                                                <select id="picker-month-guru" onchange="renderPickerCalendar('guru')" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1.5 rounded-lg outline-none cursor-pointer">
                                                 </select>
-                                                <select id="picker-year" onchange="renderPickerCalendar()" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1.5 rounded-lg outline-none cursor-pointer">
+                                                <select id="picker-year-guru" onchange="renderPickerCalendar('guru')" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1.5 rounded-lg outline-none cursor-pointer">
                                                 </select>
                                             </div>
 
-                                            <button type="button" onclick="changePickerMonth(1)" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                            <button type="button" onclick="changePickerMonth('guru', 1)" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
                                                 <i class="fas fa-chevron-right"></i>
                                             </button>
                                         </div>
 
-                                        <!-- Nama Hari -->
                                         <div class="grid grid-cols-7 text-center font-bold text-xs text-gray-500 mb-2">
                                             <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
                                         </div>
 
-                                        <!-- Grid Tanggal -->
-                                        <div id="picker-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs">
+                                        <div id="picker-days-grid-guru" class="grid grid-cols-7 gap-1 text-center text-xs">
                                         </div>
                                     </div>
 
-                                    <!-- BAGIAN JAM & TOMBOL (5 Cols) -->
+                                    <!-- BAGIAN JAM & TOMBOL -->
                                     <div class="md:col-span-5 flex flex-col justify-between space-y-4">
                                         <div>
                                             <h4 class="font-bold text-gray-800 text-sm mb-2">Time</h4>
@@ -192,37 +186,32 @@
                                             </div>
 
                                             <div class="grid grid-cols-3 gap-1.5 items-center">
-                                                <!-- Spinner Jam -->
                                                 <div class="flex flex-col items-center space-y-1">
-                                                    <button type="button" onclick="adjustPickerTime('hour', 1)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
-                                                    <div id="picker-hour-val" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">06</div>
-                                                    <button type="button" onclick="adjustPickerTime('hour', -1)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
+                                                    <button type="button" onclick="adjustPickerTime('guru', 'hour', 1)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
+                                                    <div id="picker-hour-val-guru" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">06</div>
+                                                    <button type="button" onclick="adjustPickerTime('guru', 'hour', -1)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
                                                 </div>
 
-                                                <!-- Spinner Menit -->
                                                 <div class="flex flex-col items-center space-y-1">
-                                                    <button type="button" onclick="adjustPickerTime('minute', 5)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
-                                                    <div id="picker-minute-val" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">00</div>
-                                                    <button type="button" onclick="adjustPickerTime('minute', -5)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
+                                                    <button type="button" onclick="adjustPickerTime('guru', 'minute', 5)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
+                                                    <div id="picker-minute-val-guru" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">00</div>
+                                                    <button type="button" onclick="adjustPickerTime('guru', 'minute', -5)" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
                                                 </div>
 
-                                                <!-- Spinner AM/PM -->
                                                 <div class="flex flex-col items-center space-y-1">
-                                                    <button type="button" onclick="togglePickerAmpm()" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
-                                                    <div id="picker-ampm-val" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">PM</div>
-                                                    <button type="button" onclick="togglePickerAmpm()" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
+                                                    <button type="button" onclick="togglePickerAmpm('guru')" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-up"></i></button>
+                                                    <div id="picker-ampm-val-guru" class="w-full bg-white border border-gray-200 py-2 rounded-xl text-center font-bold text-gray-800 text-sm shadow-sm">PM</div>
+                                                    <button type="button" onclick="togglePickerAmpm('guru')" class="w-full bg-gray-200 hover:bg-gray-300 py-1 rounded-lg text-gray-600 text-xs flex justify-center"><i class="fas fa-chevron-down"></i></button>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Tombol Pintas Today & Now -->
                                         <div class="grid grid-cols-2 gap-2">
-                                            <button type="button" onclick="setPickerToday()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Today</button>
-                                            <button type="button" onclick="setPickerNow()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Now</button>
+                                            <button type="button" onclick="setPickerToday('guru')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Today</button>
+                                            <button type="button" onclick="setPickerNow('guru')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Now</button>
                                         </div>
 
-                                        <!-- Tombol Done -->
-                                        <button type="button" onclick="applyDateTimePicker()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl text-sm transition-colors shadow-md">
+                                        <button type="button" onclick="applyPicker('guru')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl text-sm transition-colors shadow-md">
                                             Done
                                         </button>
                                     </div>
@@ -240,19 +229,16 @@
                 </div>
 
                 <div id="student-list-container" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-                    <!-- HEADER DAFTAR SISWA: SEARCH BAR & TOMBOL SEMUA HADIR -->
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-3 border-b border-gray-100">
                         <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
                             <h3 class="font-bold text-gray-800">Daftar Siswa</h3>
                             <span id="student-count" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">0 Siswa</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                            <!-- SEARCH BAR SISWA -->
                             <div class="relative flex-1 sm:w-48">
                                 <input type="text" id="guru-search-student" oninput="filterStudentList()" placeholder="Cari nama siswa..." class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
                                 <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
                             </div>
-                            <!-- TOMBOL SEMUA HADIR -->
                             <button type="button" onclick="setAllAttendance('Hadir')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center shadow-sm">
                                 <i class="fas fa-check-double mr-1.5"></i> Semua Hadir
                             </button>
@@ -315,7 +301,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Filter Kelas</label>
-                            <select id="admin-class" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+                            <select id="admin-class" class="w-full px-4 py-2.5 rounded-2xl border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
                                 <option value="Semua">Semua Kelas</option>
                                 <!-- KELAS 7 -->
                                 <option value="Kelas 7A">Kelas 7A</option>
@@ -342,14 +328,89 @@
                                 <option value="Kelas 9G">Kelas 9G</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
-                            <input type="date" id="admin-start-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+
+                        <!-- DATE PICKER ADMIN: TANGGAL MULAI (HANYA TANGGAL TANPA JAM) -->
+                        <div class="relative">
+                            <div class="absolute -top-3 left-4 bg-white px-2.5 py-0.5 rounded-full border border-gray-400 z-10 shadow-sm">
+                                <span class="text-[11px] font-semibold text-gray-700">Tanggal Mulai</span>
+                            </div>
+                            <div onclick="togglePicker('admin-start')" class="flex items-center justify-between bg-white border border-gray-300 hover:border-gray-900 rounded-2xl px-3.5 py-2 cursor-pointer shadow-sm transition-all">
+                                <div class="flex items-center space-x-2 text-xs font-semibold text-gray-800">
+                                    <i class="far fa-calendar text-gray-700"></i>
+                                    <span id="admin-start-display-str">Aug 04, 2026</span>
+                                </div>
+                                <i class="fas fa-calendar-alt text-gray-700 text-sm"></i>
+                            </div>
+                            <input type="hidden" id="admin-start-date" name="admin_start_date">
+
+                            <!-- POPUP CALENDAR MODAL (ADMIN START) -->
+                            <div id="picker-modal-admin-start" class="hidden absolute top-full left-0 mt-3 z-50 bg-gray-100 rounded-3xl p-4 shadow-2xl border border-gray-200 w-[290px] fade-in">
+                                <div class="bg-white/80 p-3 rounded-2xl shadow-inner mb-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <button type="button" onclick="changePickerMonth('admin-start', -1)" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <div class="flex items-center space-x-1">
+                                            <select id="picker-month-admin-start" onchange="renderPickerCalendar('admin-start')" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1 rounded-lg outline-none cursor-pointer"></select>
+                                            <select id="picker-year-admin-start" onchange="renderPickerCalendar('admin-start')" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1 rounded-lg outline-none cursor-pointer"></select>
+                                        </div>
+                                        <button type="button" onclick="changePickerMonth('admin-start', 1)" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-7 text-center font-bold text-[11px] text-gray-500 mb-1">
+                                        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                                    </div>
+                                    <div id="picker-days-grid-admin-start" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button type="button" onclick="setPickerToday('admin-start')" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Today</button>
+                                    <button type="button" onclick="applyPicker('admin-start')" class="flex-1 bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-xl text-xs transition-colors shadow-md">Done</button>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Sampai</label>
-                            <input type="date" id="admin-end-date" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
+
+                        <!-- DATE PICKER ADMIN: TANGGAL SAMPAI (HANYA TANGGAL TANPA JAM) -->
+                        <div class="relative">
+                            <div class="absolute -top-3 left-4 bg-white px-2.5 py-0.5 rounded-full border border-gray-400 z-10 shadow-sm">
+                                <span class="text-[11px] font-semibold text-gray-700">Tanggal Sampai</span>
+                            </div>
+                            <div onclick="togglePicker('admin-end')" class="flex items-center justify-between bg-white border border-gray-300 hover:border-gray-900 rounded-2xl px-3.5 py-2 cursor-pointer shadow-sm transition-all">
+                                <div class="flex items-center space-x-2 text-xs font-semibold text-gray-800">
+                                    <i class="far fa-calendar text-gray-700"></i>
+                                    <span id="admin-end-display-str">Aug 04, 2026</span>
+                                </div>
+                                <i class="fas fa-calendar-alt text-gray-700 text-sm"></i>
+                            </div>
+                            <input type="hidden" id="admin-end-date" name="admin_end_date">
+
+                            <!-- POPUP CALENDAR MODAL (ADMIN END) -->
+                            <div id="picker-modal-admin-end" class="hidden absolute top-full right-0 lg:left-0 mt-3 z-50 bg-gray-100 rounded-3xl p-4 shadow-2xl border border-gray-200 w-[290px] fade-in">
+                                <div class="bg-white/80 p-3 rounded-2xl shadow-inner mb-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <button type="button" onclick="changePickerMonth('admin-end', -1)" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <div class="flex items-center space-x-1">
+                                            <select id="picker-month-admin-end" onchange="renderPickerCalendar('admin-end')" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1 rounded-lg outline-none cursor-pointer"></select>
+                                            <select id="picker-year-admin-end" onchange="renderPickerCalendar('admin-end')" class="bg-gray-200/80 text-gray-800 font-semibold text-xs px-2 py-1 rounded-lg outline-none cursor-pointer"></select>
+                                        </div>
+                                        <button type="button" onclick="changePickerMonth('admin-end', 1)" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-600 text-xs transition-colors">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-7 text-center font-bold text-[11px] text-gray-500 mb-1">
+                                        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                                    </div>
+                                    <div id="picker-days-grid-admin-end" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button type="button" onclick="setPickerToday('admin-end')" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition-colors">Today</button>
+                                    <button type="button" onclick="applyPicker('admin-end')" class="flex-1 bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-xl text-xs transition-colors shadow-md">Done</button>
+                                </div>
+                            </div>
                         </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Status Absen</label>
                             <select id="admin-status" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
@@ -365,7 +426,7 @@
                             <input type="text" id="admin-search" placeholder="Ketik nama..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-900 outline-none">
                         </div>
                         <div>
-                            <button onclick="loadReport()" class="w-full bg-gray-900 hover:bg-black text-white px-5 py-2 rounded-lg font-medium transition-colors shadow-sm">
+                            <button onclick="loadReport()" class="w-full bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm">
                                 <i class="fas fa-search mr-1"></i> Tampilkan
                             </button>
                         </div>
@@ -416,203 +477,229 @@
 
         let currentUser = null;
 
-        // --- STATE UNTUK CUSTOM DATE & TIME PICKER ---
+        // --- CUSTOM DATE & TIME PICKER STATE & LOGIC ---
         const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-        let pickerState = {
-            year: 2026,
-            month: 7, // August (0-indexed)
-            day: 4,
-            hour: 6,
-            minute: 0,
-            ampm: 'PM'
+        let pickersState = {
+            'guru': { year: 2026, month: 7, day: 4, hour: 6, minute: 0, ampm: 'PM', hasTime: true },
+            'admin-start': { year: 2026, month: 7, day: 4, hour: 0, minute: 0, ampm: 'AM', hasTime: false },
+            'admin-end': { year: 2026, month: 7, day: 4, hour: 0, minute: 0, ampm: 'AM', hasTime: false }
         };
 
-        function initDateTimePicker() {
+        function initAllPickers() {
             const now = new Date();
-            pickerState.year = now.getFullYear();
-            pickerState.month = now.getMonth();
-            pickerState.day = now.getDate();
-            
+            const curYear = now.getFullYear();
+            const curMonth = now.getMonth();
+            const curDay = now.getDate();
+
             let hours = now.getHours();
-            pickerState.ampm = hours >= 12 ? 'PM' : 'AM';
+            const ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12;
-            pickerState.hour = hours ? hours : 12;
-            pickerState.minute = Math.floor(now.getMinutes() / 5) * 5;
+            const hour = hours ? hours : 12;
+            const minute = Math.floor(now.getMinutes() / 5) * 5;
 
-            populatePickerDropdowns();
-            renderPickerCalendar();
-            updatePickerTimeUI();
-            applyDateTimePicker(false);
+            ['guru', 'admin-start', 'admin-end'].forEach(key => {
+                pickersState[key].year = curYear;
+                pickersState[key].month = curMonth;
+                pickersState[key].day = curDay;
+
+                if (pickersState[key].hasTime) {
+                    pickersState[key].hour = hour;
+                    pickersState[key].minute = minute;
+                    pickersState[key].ampm = ampm;
+                }
+
+                populatePickerDropdowns(key);
+                renderPickerCalendar(key);
+                if (pickersState[key].hasTime) {
+                    updatePickerTimeUI(key);
+                }
+                applyPicker(key, false);
+            });
         }
 
-        function toggleDateTimePicker() {
-            const picker = document.getElementById('custom-datetime-picker');
-            if(picker) picker.classList.toggle('hidden');
+        function togglePicker(key) {
+            const targetPicker = document.getElementById(`picker-modal-${key}`);
+            ['guru', 'admin-start', 'admin-end'].forEach(k => {
+                if (k !== key) {
+                    const p = document.getElementById(`picker-modal-${k}`);
+                    if (p) p.classList.add('hidden');
+                }
+            });
+            if (targetPicker) targetPicker.classList.toggle('hidden');
         }
 
-        function populatePickerDropdowns() {
-            const mSelect = document.getElementById('picker-month');
-            const ySelect = document.getElementById('picker-year');
+        function populatePickerDropdowns(key) {
+            const mSelect = document.getElementById(`picker-month-${key}`);
+            const ySelect = document.getElementById(`picker-year-${key}`);
 
             if (mSelect) {
                 mSelect.innerHTML = monthNamesFull.map((m, idx) => 
-                    `<option value="${idx}" ${idx === pickerState.month ? 'selected' : ''}>${m}</option>`
+                    `<option value="${idx}" ${idx === pickersState[key].month ? 'selected' : ''}>${m}</option>`
                 ).join('');
             }
 
             if (ySelect) {
                 let years = [];
                 for (let y = 2020; y <= 2035; y++) {
-                    years.push(`<option value="${y}" ${y === pickerState.year ? 'selected' : ''}>${y}</option>`);
+                    years.push(`<option value="${y}" ${y === pickersState[key].year ? 'selected' : ''}>${y}</option>`);
                 }
                 ySelect.innerHTML = years.join('');
             }
         }
 
-        function renderPickerCalendar() {
-            const mSelect = document.getElementById('picker-month');
-            const ySelect = document.getElementById('picker-year');
-            if (mSelect) pickerState.month = parseInt(mSelect.value, 10);
-            if (ySelect) pickerState.year = parseInt(ySelect.value, 10);
+        function renderPickerCalendar(key) {
+            const mSelect = document.getElementById(`picker-month-${key}`);
+            const ySelect = document.getElementById(`picker-year-${key}`);
+            if (mSelect) pickersState[key].month = parseInt(mSelect.value, 10);
+            if (ySelect) pickersState[key].year = parseInt(ySelect.value, 10);
 
-            const grid = document.getElementById('picker-days-grid');
+            const grid = document.getElementById(`picker-days-grid-${key}`);
             if (!grid) return;
             grid.innerHTML = '';
 
-            const firstDayIdx = new Date(pickerState.year, pickerState.month, 1).getDay();
-            const totalDays = new Date(pickerState.year, pickerState.month + 1, 0).getDate();
-            const prevTotalDays = new Date(pickerState.year, pickerState.month, 0).getDate();
+            const firstDayIdx = new Date(pickersState[key].year, pickersState[key].month, 1).getDay();
+            const totalDays = new Date(pickersState[key].year, pickersState[key].month + 1, 0).getDate();
+            const prevTotalDays = new Date(pickersState[key].year, pickersState[key].month, 0).getDate();
 
-            // Padding bulan sebelumnya
             for (let x = firstDayIdx; x > 0; x--) {
                 const dayNum = prevTotalDays - x + 1;
-                grid.innerHTML += `<div class="py-2 text-gray-300 font-light flex items-center justify-center">${dayNum}</div>`;
+                grid.innerHTML += `<div class="py-1.5 text-gray-300 font-light flex items-center justify-center">${dayNum}</div>`;
             }
 
-            // Tanggal bulan aktif
+            const activeBgClass = key === 'guru' ? 'bg-indigo-600' : 'bg-gray-900';
             for (let i = 1; i <= totalDays; i++) {
-                const isSelected = (i === pickerState.day);
+                const isSelected = (i === pickersState[key].day);
                 const btnClass = isSelected
-                    ? "bg-indigo-600 text-white font-bold rounded-xl shadow-md"
+                    ? `${activeBgClass} text-white font-bold rounded-xl shadow-md`
                     : "text-gray-700 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer";
 
                 grid.innerHTML += `
-                    <div onclick="selectPickerDay(${i})" class="py-2 flex items-center justify-center font-medium ${btnClass}">
+                    <div onclick="selectPickerDay('${key}', ${i})" class="py-1.5 flex items-center justify-center font-medium ${btnClass}">
                         ${i}
                     </div>
                 `;
             }
         }
 
-        function selectPickerDay(day) {
-            pickerState.day = day;
-            renderPickerCalendar();
+        function selectPickerDay(key, day) {
+            pickersState[key].day = day;
+            renderPickerCalendar(key);
         }
 
-        function changePickerMonth(delta) {
-            pickerState.month += delta;
-            if (pickerState.month < 0) {
-                pickerState.month = 11;
-                pickerState.year--;
-            } else if (pickerState.month > 11) {
-                pickerState.month = 0;
-                pickerState.year++;
+        function changePickerMonth(key, delta) {
+            pickersState[key].month += delta;
+            if (pickersState[key].month < 0) {
+                pickersState[key].month = 11;
+                pickersState[key].year--;
+            } else if (pickersState[key].month > 11) {
+                pickersState[key].month = 0;
+                pickersState[key].year++;
             }
-            populatePickerDropdowns();
-            renderPickerCalendar();
+            populatePickerDropdowns(key);
+            renderPickerCalendar(key);
         }
 
-        function adjustPickerTime(unit, delta) {
+        function adjustPickerTime(key, unit, delta) {
+            if (!pickersState[key].hasTime) return;
             if (unit === 'hour') {
-                pickerState.hour += delta;
-                if (pickerState.hour > 12) pickerState.hour = 1;
-                if (pickerState.hour < 1) pickerState.hour = 12;
+                pickersState[key].hour += delta;
+                if (pickersState[key].hour > 12) pickersState[key].hour = 1;
+                if (pickersState[key].hour < 1) pickersState[key].hour = 12;
             } else if (unit === 'minute') {
-                pickerState.minute += delta;
-                if (pickerState.minute >= 60) pickerState.minute = 0;
-                if (pickerState.minute < 0) pickerState.minute = 55;
+                pickersState[key].minute += delta;
+                if (pickersState[key].minute >= 60) pickersState[key].minute = 0;
+                if (pickersState[key].minute < 0) pickersState[key].minute = 55;
             }
-            updatePickerTimeUI();
+            updatePickerTimeUI(key);
         }
 
-        function togglePickerAmpm() {
-            pickerState.ampm = pickerState.ampm === 'AM' ? 'PM' : 'AM';
-            updatePickerTimeUI();
+        function togglePickerAmpm(key) {
+            if (!pickersState[key].hasTime) return;
+            pickersState[key].ampm = pickersState[key].ampm === 'AM' ? 'PM' : 'AM';
+            updatePickerTimeUI(key);
         }
 
-        function updatePickerTimeUI() {
-            const hEl = document.getElementById('picker-hour-val');
-            const mEl = document.getElementById('picker-minute-val');
-            const aEl = document.getElementById('picker-ampm-val');
+        function updatePickerTimeUI(key) {
+            if (!pickersState[key].hasTime) return;
+            const hEl = document.getElementById(`picker-hour-val-${key}`);
+            const mEl = document.getElementById(`picker-minute-val-${key}`);
+            const aEl = document.getElementById(`picker-ampm-val-${key}`);
 
-            if (hEl) hEl.textContent = String(pickerState.hour).padStart(2, '0');
-            if (mEl) mEl.textContent = String(pickerState.minute).padStart(2, '0');
-            if (aEl) aEl.textContent = pickerState.ampm;
+            if (hEl) hEl.textContent = String(pickersState[key].hour).padStart(2, '0');
+            if (mEl) mEl.textContent = String(pickersState[key].minute).padStart(2, '0');
+            if (aEl) aEl.textContent = pickersState[key].ampm;
         }
 
-        function setPickerToday() {
+        function setPickerToday(key) {
             const now = new Date();
-            pickerState.year = now.getFullYear();
-            pickerState.month = now.getMonth();
-            pickerState.day = now.getDate();
-            populatePickerDropdowns();
-            renderPickerCalendar();
+            pickersState[key].year = now.getFullYear();
+            pickersState[key].month = now.getMonth();
+            pickersState[key].day = now.getDate();
+            populatePickerDropdowns(key);
+            renderPickerCalendar(key);
         }
 
-        function setPickerNow() {
-            setPickerToday();
-            const now = new Date();
-            let hours = now.getHours();
-            pickerState.ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            pickerState.hour = hours ? hours : 12;
-            pickerState.minute = Math.floor(now.getMinutes() / 5) * 5;
-            updatePickerTimeUI();
+        function setPickerNow(key) {
+            setPickerToday(key);
+            if (pickersState[key].hasTime) {
+                const now = new Date();
+                let hours = now.getHours();
+                pickersState[key].ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                pickersState[key].hour = hours ? hours : 12;
+                pickersState[key].minute = Math.floor(now.getMinutes() / 5) * 5;
+                updatePickerTimeUI(key);
+            }
         }
 
-        function applyDateTimePicker(close = true) {
-            // ISO YYYY-MM-DD
-            const mStr = String(pickerState.month + 1).padStart(2, '0');
-            const dStr = String(pickerState.day).padStart(2, '0');
-            const dateISO = `${pickerState.year}-${mStr}-${dStr}`;
+        function applyPicker(key, close = true) {
+            const mStr = String(pickersState[key].month + 1).padStart(2, '0');
+            const dStr = String(pickersState[key].day).padStart(2, '0');
+            const dateISO = `${pickersState[key].year}-${mStr}-${dStr}`;
 
-            // 24H Time Format
-            let h24 = pickerState.hour;
-            if (pickerState.ampm === 'PM' && h24 < 12) h24 += 12;
-            if (pickerState.ampm === 'AM' && h24 === 12) h24 = 0;
-            const timeISO = `${String(h24).padStart(2, '0')}:${String(pickerState.minute).padStart(2, '0')}`;
+            if (key === 'guru') {
+                let h24 = pickersState[key].hour;
+                if (pickersState[key].ampm === 'PM' && h24 < 12) h24 += 12;
+                if (pickersState[key].ampm === 'AM' && h24 === 12) h24 = 0;
+                const timeISO = `${String(h24).padStart(2, '0')}:${String(pickersState[key].minute).padStart(2, '0')}`;
 
-            // Assign Hidden Inputs
-            const dateInput = document.getElementById('guru-date');
-            const timeInput = document.getElementById('guru-time');
-            if (dateInput) dateInput.value = dateISO;
-            if (timeInput) timeInput.value = timeISO;
+                const dateInput = document.getElementById('guru-date');
+                const timeInput = document.getElementById('guru-time');
+                if (dateInput) dateInput.value = dateISO;
+                if (timeInput) timeInput.value = timeISO;
 
-            // Format Display String: Aug 04, 2026 | 06 : 00 PM
-            const mShort = monthNamesShort[pickerState.month];
-            const dateDisplayStr = `${mShort} ${dStr}, ${pickerState.year}`;
-            const timeDisplayStr = `${String(pickerState.hour).padStart(2, '0')} : ${String(pickerState.minute).padStart(2, '0')} ${pickerState.ampm}`;
+                const mShort = monthNamesShort[pickersState[key].month];
+                const dateDisplayStr = `${mShort} ${dStr}, ${pickersState[key].year}`;
+                const timeDisplayStr = `${String(pickersState[key].hour).padStart(2, '0')} : ${String(pickersState[key].minute).padStart(2, '0')} ${pickersState[key].ampm}`;
 
-            const dateLabel = document.getElementById('guru-date-display-str');
-            const timeLabel = document.getElementById('guru-time-display-str');
-            if (dateLabel) dateLabel.textContent = dateDisplayStr;
-            if (timeLabel) timeLabel.textContent = timeDisplayStr;
+                const dateLabel = document.getElementById('guru-date-display-str');
+                const timeLabel = document.getElementById('guru-time-display-str');
+                if (dateLabel) dateLabel.textContent = dateDisplayStr;
+                if (timeLabel) timeLabel.textContent = timeDisplayStr;
+            } else if (key === 'admin-start') {
+                const input = document.getElementById('admin-start-date');
+                if (input) input.value = dateISO;
+                const mShort = monthNamesShort[pickersState[key].month];
+                const label = document.getElementById('admin-start-display-str');
+                if (label) label.textContent = `${mShort} ${dStr}, ${pickersState[key].year}`;
+            } else if (key === 'admin-end') {
+                const input = document.getElementById('admin-end-date');
+                if (input) input.value = dateISO;
+                const mShort = monthNamesShort[pickersState[key].month];
+                const label = document.getElementById('admin-end-display-str');
+                if (label) label.textContent = `${mShort} ${dStr}, ${pickersState[key].year}`;
+            }
 
             if (close) {
-                const picker = document.getElementById('custom-datetime-picker');
+                const picker = document.getElementById(`picker-modal-${key}`);
                 if (picker) picker.classList.add('hidden');
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('admin-start-date').value = today;
-            document.getElementById('admin-end-date').value = today;
-            
-            // Inisialisasi Custom Date Time Picker
-            initDateTimePicker();
+            initAllPickers();
         });
 
         function showPage(pageId) {
