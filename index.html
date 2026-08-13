@@ -439,7 +439,7 @@
 
                 studentList.forEach((student) => {
                     const record = attendanceMap[student.id];
-                    const currentStatus = record ? record.status : 'Alpa';
+                    const currentStatus = record ? record.status : 'Hadir'; // Default radio diset ke Hadir jika belum diabsen
                     const currentNote = record ? (record.note || '') : '';
 
                     const html = `
@@ -474,7 +474,7 @@
             }
         }
 
-        // --- SIMPAN ABSENSI ---
+        // --- SIMPAN ABSENSI (HANYA SISWA HADIR) ---
         document.getElementById('attendance-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -485,16 +485,26 @@
             let attendanceData = [];
 
             studentIds.forEach(id => {
-                attendanceData.push({
-                    student_id: id,
-                    student_name: formData.get(`student_name_${id}`),
-                    class_name: className,
-                    date: dateStr,
-                    status: formData.get(`status_${id}`),
-                    note: formData.get(`note_${id}`) || '-',
-                    guru: currentUser ? currentUser.name : 'Guru'
-                });
+                const status = formData.get(`status_${id}`);
+                
+                // FILTER: Hanya masukkan siswa yang statusnya Hadir
+                if (status === 'Hadir') {
+                    attendanceData.push({
+                        student_id: id,
+                        student_name: formData.get(`student_name_${id}`),
+                        class_name: className,
+                        date: dateStr,
+                        status: status,
+                        note: formData.get(`note_${id}`) || '-',
+                        guru: currentUser ? currentUser.name : 'Guru'
+                    });
+                }
             });
+
+            if (attendanceData.length === 0) {
+                showToast('Tidak ada siswa dengan status Hadir untuk disimpan', 'info');
+                return;
+            }
 
             const btn = e.target.querySelector('button');
             const originalText = btn.innerHTML;
@@ -507,7 +517,7 @@
                     .upsert(attendanceData, { onConflict: 'student_id,date' });
 
                 if (!error) {
-                    showToast('Absensi berhasil disimpan!', 'success');
+                    showToast(`Absensi berhasil disimpan! ${attendanceData.length} siswa Hadir tersimpan.`, 'success');
                 } else {
                     console.error(error);
                     showToast('Gagal menyimpan absensi', 'error');
