@@ -1149,6 +1149,11 @@
             const endDate = document.getElementById('admin-end-date').value;
 
             const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showToast('Popup diblokir oleh browser. Izinkan popup untuk mencetak.', 'error');
+                return;
+            }
+
             printWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
@@ -1157,7 +1162,7 @@
                     <style>
                         body { font-family: 'Inter', sans-serif; padding: 25px; color: #1f2937; }
                         .kop-container { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px; }
-                        .logo-icon { width: 52px; height: 52px; color: #2563eb; }
+                        .logo-icon { width: 52px; height: 52px; object-fit: contain; }
                         .kop-text { text-align: center; }
                         .kop-text h1 { margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #111827; }
                         .kop-text h2 { margin: 2px 0 0 0; font-size: 15px; font-weight: 600; color: #374151; }
@@ -1171,7 +1176,7 @@
                 </head>
                 <body>
                     <div class="kop-container">
-                        <img src="logo.png" class="logo-icon" alt="Logo Sekolah">
+                        <img src="logo.png" class="logo-icon" alt="Logo Sekolah" onerror="this.style.display='none'">
                         <div class="kop-text">
                             <h1>SISTEM ABSENSI BIRO</h1>
                             <h2>LAPORAN KEHADIRAN SISWA</h2>
@@ -1221,7 +1226,7 @@
             setTimeout(() => {
                 printWindow.print();
                 printWindow.close();
-            }, 250);
+            }, 500);
         }
 
         // --- EXPORT KE CSV ---
