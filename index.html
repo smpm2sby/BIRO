@@ -456,11 +456,12 @@
                                     <th onclick="sortTable('status')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Status <i id="sort-icon-status" class="fas fa-sort ml-1 text-gray-400"></i></th>
                                     <th onclick="sortTable('note')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Materi <i id="sort-icon-note" class="fas fa-sort ml-1 text-gray-400"></i></th>
                                     <th onclick="sortTable('guru')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Guru <i id="sort-icon-guru" class="fas fa-sort ml-1 text-gray-400"></i></th>
+                                    <th class="px-6 py-4 font-medium text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="report-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
                                 <tr>
-                                    <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                                    <td colspan="7" class="px-6 py-8 text-center text-gray-400">
                                         Pilih filter dan klik "Tampilkan Laporan"
                                     </td>
                                 </tr>
@@ -975,7 +976,7 @@
             const searchQuery = document.getElementById('admin-search').value.toLowerCase();
             const tbody = document.getElementById('report-table-body');
 
-            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin text-xl"></i> Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin text-xl"></i> Memuat data...</td></tr>';
 
             try {
                 let query = supabaseClient.from('attendance').select('*');
@@ -991,7 +992,7 @@
 
                 if (error) {
                     showToast('Gagal mengambil laporan', 'error');
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Gagal mengambil data</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal mengambil data</td></tr>';
                     return;
                 }
 
@@ -1019,7 +1020,34 @@
                 renderReportTable(currentReportData);
             } catch (error) {
                 showToast('Gagal mengambil laporan', 'error');
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Gagal mengambil data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal mengambil data</td></tr>';
+            }
+        }
+
+        // --- FITUR HAPUS BARIS LAPORAN ABSENSI ---
+        async function deleteAttendanceRecord(id, studentId, date) {
+            if (!confirm('Apakah Anda yakin ingin menghapus data absensi siswa ini?')) return;
+
+            try {
+                let query = supabaseClient.from('attendance').delete();
+                if (id && id !== 'undefined' && id !== 'null') {
+                    query = query.eq('id', id);
+                } else {
+                    query = query.eq('student_id', studentId).eq('date', date);
+                }
+
+                const { error } = await query;
+
+                if (!error) {
+                    showToast('Data absensi berhasil dihapus', 'success');
+                    loadReport();
+                } else {
+                    console.error(error);
+                    showToast('Gagal menghapus data absensi', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Terjadi kesalahan saat menghapus data', 'error');
             }
         }
 
@@ -1059,7 +1087,7 @@
             tbody.innerHTML = '';
 
             if (!records || records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Tidak ada data absensi ditemukan pada filter ini.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Tidak ada data absensi ditemukan pada filter ini.</td></tr>';
                 return;
             }
 
@@ -1080,6 +1108,11 @@
                         <td class="px-6 py-4">${statusBadge}</td>
                         <td class="px-6 py-4 text-gray-500 text-sm">${r.note}</td>
                         <td class="px-6 py-4 text-sm">${r.guru}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="deleteAttendanceRecord('${r.id || ''}', '${r.student_id}', '${r.date}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Hapus Data">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
                 tbody.insertAdjacentHTML('beforeend', html);
@@ -1111,9 +1144,12 @@
             rows.forEach(row => {
                 let rowData = [];
                 const cols = row.querySelectorAll('td');
-                cols.forEach(col => {
-                    let text = col.innerText || col.textContent;
-                    rowData.push('"' + text.replace(/"/g, '""') + '"');
+                // Mengabaikan kolom terakhir (Aksi Delete) dari ekspor CSV
+                cols.forEach((col, idx) => {
+                    if (idx < 6) {
+                        let text = col.innerText || col.textContent;
+                        rowData.push('"' + text.replace(/"/g, '""') + '"');
+                    }
                 });
                 csvContent += rowData.join(";") + "\n";
             });
