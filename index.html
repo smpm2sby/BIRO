@@ -450,12 +450,12 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-white text-gray-500 text-xs uppercase border-b border-gray-200">
-                                    <th class="px-6 py-4 font-medium">Tanggal</th>
-                                    <th class="px-6 py-4 font-medium">Nama Siswa</th>
-                                    <th class="px-6 py-4 font-medium">Kelas</th>
-                                    <th class="px-6 py-4 font-medium">Status</th>
-                                    <th class="px-6 py-4 font-medium">Materi</th>
-                                    <th class="px-6 py-4 font-medium">Guru</th>
+                                    <th onclick="sortTable('date')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Tanggal <i id="sort-icon-date" class="fas fa-sort ml-1 text-gray-400"></i></th>
+                                    <th onclick="sortTable('student_name')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Nama Siswa <i id="sort-icon-student_name" class="fas fa-sort ml-1 text-gray-400"></i></th>
+                                    <th onclick="sortTable('class_name')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Kelas <i id="sort-icon-class_name" class="fas fa-sort ml-1 text-gray-400"></i></th>
+                                    <th onclick="sortTable('status')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Status <i id="sort-icon-status" class="fas fa-sort ml-1 text-gray-400"></i></th>
+                                    <th onclick="sortTable('note')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Materi <i id="sort-icon-note" class="fas fa-sort ml-1 text-gray-400"></i></th>
+                                    <th onclick="sortTable('guru')" class="px-6 py-4 font-medium cursor-pointer select-none hover:bg-gray-100 transition-colors">Guru <i id="sort-icon-guru" class="fas fa-sort ml-1 text-gray-400"></i></th>
                                 </tr>
                             </thead>
                             <tbody id="report-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
@@ -481,6 +481,9 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
+        let currentReportData = [];
+        let sortColumnKey = null;
+        let sortAscending = true;
 
         // --- CUSTOM DATE & TIME PICKER STATE & LOGIC ---
         const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1002,11 +1005,53 @@
                     filteredRecords = filteredRecords.filter(r => r.student_name.toLowerCase().includes(searchQuery.trim()));
                 }
 
-                renderReportTable(filteredRecords);
+                currentReportData = filteredRecords;
+                if (sortColumnKey) {
+                    currentReportData.sort((a, b) => {
+                        let valA = (a[sortColumnKey] || '').toString().toLowerCase();
+                        let valB = (b[sortColumnKey] || '').toString().toLowerCase();
+                        if (valA < valB) return sortAscending ? -1 : 1;
+                        if (valA > valB) return sortAscending ? 1 : -1;
+                        return 0;
+                    });
+                }
+
+                renderReportTable(currentReportData);
             } catch (error) {
                 showToast('Gagal mengambil laporan', 'error');
                 tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Gagal mengambil data</td></tr>';
             }
+        }
+
+        // --- FITUR SORTIR KOLOM TABEL LAPORAN ---
+        function sortTable(key) {
+            if (sortColumnKey === key) {
+                sortAscending = !sortAscending;
+            } else {
+                sortColumnKey = key;
+                sortAscending = true;
+            }
+
+            ['date', 'student_name', 'class_name', 'status', 'note', 'guru'].forEach(k => {
+                const icon = document.getElementById(`sort-icon-${k}`);
+                if (icon) {
+                    if (k === sortColumnKey) {
+                        icon.className = sortAscending ? 'fas fa-sort-up ml-1 text-gray-900' : 'fas fa-sort-down ml-1 text-gray-900';
+                    } else {
+                        icon.className = 'fas fa-sort ml-1 text-gray-400';
+                    }
+                }
+            });
+
+            currentReportData.sort((a, b) => {
+                let valA = (a[key] || '').toString().toLowerCase();
+                let valB = (b[key] || '').toString().toLowerCase();
+                if (valA < valB) return sortAscending ? -1 : 1;
+                if (valA > valB) return sortAscending ? 1 : -1;
+                return 0;
+            });
+
+            renderReportTable(currentReportData);
         }
 
         function renderReportTable(records) {
