@@ -442,9 +442,14 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                         <h3 class="font-bold text-gray-800">Tabel Laporan Absensi</h3>
-                        <button onclick="exportToCSV()" class="text-sm bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-md font-medium transition-colors">
-                            <i class="fas fa-file-excel mr-1"></i> Export
-                        </button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="printReportTable()" class="text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-md font-medium transition-colors">
+                                <i class="fas fa-print mr-1"></i> Cetak
+                            </button>
+                            <button onclick="exportToCSV()" class="text-sm bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-md font-medium transition-colors">
+                                <i class="fas fa-file-excel mr-1"></i> Export
+                            </button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -1129,6 +1134,82 @@
             document.getElementById('stat-izin').textContent = counts.Izin;
             document.getElementById('stat-sakit').textContent = counts.Sakit;
             document.getElementById('stat-alpa').textContent = counts.Alpa;
+        }
+
+        // --- FITUR PRINT TABEL LAPORAN ---
+        function printReportTable() {
+            const rows = document.querySelectorAll('#report-table-body tr');
+            if (rows.length === 0 || rows[0].cells.length === 1) {
+                showToast('Tidak ada data untuk dicetak', 'error');
+                return;
+            }
+
+            const className = document.getElementById('admin-class').value;
+            const startDate = document.getElementById('admin-start-date').value;
+            const endDate = document.getElementById('admin-end-date').value;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Laporan Absensi Biro</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; padding: 20px; color: #1f2937; }
+                        h2 { text-align: center; margin-bottom: 4px; font-size: 20px; font-weight: bold; }
+                        p.subtitle { text-align: center; font-size: 13px; color: #4b5563; margin-top: 0; margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                        th, td { border: 1px solid #d1d5db; padding: 10px 12px; font-size: 12px; text-align: left; }
+                        th { background-color: #f3f4f6; font-weight: bold; text-transform: uppercase; color: #374151; }
+                        tr:nth-child(even) { background-color: #f9fafb; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Laporan Absensi Biro</h2>
+                    <p class="subtitle">Kelas: ${className} | Periode: ${startDate} s.d. ${endDate}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama Siswa</th>
+                                <th>Kelas</th>
+                                <th>Status</th>
+                                <th>Materi</th>
+                                <th>Guru</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `);
+
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 6) {
+                    printWindow.document.write(`
+                        <tr>
+                            <td>${cols[0].innerText || ''}</td>
+                            <td>${cols[1].innerText || ''}</td>
+                            <td>${cols[2].innerText || ''}</td>
+                            <td>${cols[3].innerText || ''}</td>
+                            <td>${cols[4].innerText || ''}</td>
+                            <td>${cols[5].innerText || ''}</td>
+                        </tr>
+                    `);
+                }
+            });
+
+            printWindow.document.write(`
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
         }
 
         // --- EXPORT KE CSV ---
