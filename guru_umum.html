@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Guru Umum</title>
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Library Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #022c22 100%);
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Animated Ambient Glowing Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            z-index: 0;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+        .orb-1 { width: 300px; height: 300px; background: #10b981; top: -50px; left: -50px; }
+        .orb-2 { width: 350px; height: 350px; background: #059669; bottom: -80px; right: -50px; animation-delay: -4s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 40px) scale(1.1); }
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(12px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden text-gray-800">
+
+    <!-- Ambient Glowing Background Effect -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 z-50 hidden transform transition-all duration-300">
+        <div class="bg-gray-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 border border-gray-700">
+            <i id="toast-icon" class="fas fa-info-circle text-emerald-400"></i>
+            <span id="toast-message" class="font-medium text-sm">Notifikasi</span>
+        </div>
+    </div>
+
+    <!-- MAIN LOGIN CARD (UNIQUE GLASS & SPLIT DESIGN) -->
+    <div class="w-full max-w-4xl glass-card rounded-3xl shadow-2xl overflow-hidden relative z-10 grid grid-cols-1 md:grid-cols-12 border border-emerald-500/20 fade-in">
+        
+        <!-- SIDE PANEL (LEFT / HERO BRANDING) -->
+        <div class="md:col-span-5 bg-gradient-to-br from-emerald-700 via-teal-800 to-emerald-950 p-8 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
+            <!-- Decorative Pattern Background -->
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-extrabold select-none pointer-events-none">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+
+            <div>
+                <div class="inline-flex items-center space-x-2 bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 px-3.5 py-1.5 rounded-full text-emerald-200 text-xs font-semibold mb-6">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Modul Guru Umum</span>
+                </div>
+                <h1 class="text-3xl font-extrabold tracking-tight leading-tight">
+                    Portal Mengajar <br>Guru Umum
+                </h1>
+                <p class="text-emerald-100/80 text-sm mt-3 font-normal leading-relaxed">
+                    Akses khusus untuk pengelolaan pembelajaran, presensi kelas umum, dan jurnal materi pelajaran harian.
+                </p>
+            </div>
+
+            <!-- Bottom Badge / Features Preview -->
+            <div class="mt-8 pt-6 border-t border-emerald-600/40 space-y-3 text-xs text-emerald-100/90">
+                <div class="flex items-center space-x-2.5">
+                    <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+                    <span>Absensi Presensial & Jurnal Mengajar</span>
+                </div>
+                <div class="flex items-center space-x-2.5">
+                    <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+                    <span>Terintegrasi Database Utama</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM PANEL (RIGHT) -->
+        <div class="md:col-span-7 p-8 sm:p-12 bg-white/80 flex flex-col justify-center">
+            
+            <div class="mb-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Selamat Datang</h2>
+                    <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full">Guru Umum</span>
+                </div>
+                <p class="text-gray-500 text-sm mt-1">Silakan masuk menggunakan NIP / ID Guru Anda</p>
+            </div>
+
+            <form id="login-form-guru-umum" class="space-y-5">
+                
+                <!-- Input NIP / Username -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">NIP / Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+                            <i class="fas fa-id-card"></i>
+                        </span>
+                        <input type="text" id="guru-username" required placeholder="Masukkan NIP atau Username" 
+                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm font-medium">
+                    </div>
+                </div>
+
+                <!-- Input Password -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Kata Sandi</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" id="guru-password" required placeholder="Masukkan kata sandi" 
+                            class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm font-medium">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600">
+                            <i id="eye-icon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Option Mata Pelajaran (Optional Filter Preview) -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Mata Pelajaran Utama</label>
+                    <select id="guru-mapel" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm font-medium text-gray-700">
+                        <option value="Umum">Mata Pelajaran Umum / Kelas</option>
+                        <option value="Informatika">Informatika / TIK</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="IPA">IPA (Sains)</option>
+                        <option value="IPS">IPS</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        <option value="Lainnya">Lainnya...</option>
+                    </select>
+                </div>
+
+                <!-- Tombol Submit Login -->
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-600/30 flex justify-center items-center text-sm transform hover:-translate-y-0.5">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Masuk ke Portal Guru Umum
+                </button>
+            </form>
+
+            <!-- Navigation Back Link -->
+            <div class="mt-8 pt-5 border-t border-gray-100 flex items-center justify-between text-xs">
+                <a href="index.html" class="inline-flex items-center text-gray-500 hover:text-emerald-700 font-medium transition-colors">
+                    <i class="fas fa-arrow-left mr-1.5"></i> Kembali ke Portal Biro
+                </a>
+                <span class="text-gray-400">v1.0 &bull; SPEMDA</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const SUPABASE_URL = "https://ujbiawpaxdgrmgkznkef.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqYmlhd3BheGRncm1na3pua2VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MjkxMzQsImV4cCI6MjEwMjEwNTEzNH0.n6YzZlZLFQ-zG1mGeCtFJdyzVMAyxiu-6cqBioZPcMU";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Toggle Password Visibility
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('guru-password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.className = 'fas fa-eye-slash';
+            } else {
+                passInput.type = 'password';
+                eyeIcon.className = 'fas fa-eye';
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toast.classList.remove('hidden');
+            toastMsg.textContent = message;
+            
+            if(type === 'success') {
+                toastIcon.className = 'fas fa-check-circle text-emerald-400';
+            } else if(type === 'error') {
+                toastIcon.className = 'fas fa-exclamation-circle text-red-400';
+            } else {
+                toastIcon.className = 'fas fa-info-circle text-blue-400';
+            }
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Form Submit Login Guru Umum
+        document.getElementById('login-form-guru-umum').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('guru-username').value;
+            const password = document.getElementById('guru-password').value;
+            const mapel = document.getElementById('guru-mapel').value;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memeriksa Akses...';
+            btn.disabled = true;
+
+            try {
+                // Cek user dari Supabase
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .maybeSingle();
+
+                if (error || !data) {
+                    showToast('Username atau Kata Sandi salah!', 'error');
+                } else {
+                    showToast(`Berhasil masuk! Selamat datang, ${data.name}`, 'success');
+                    // Simulasi redirect / simpan session
+                    setTimeout(() => {
+                        alert(`Login Berhasil!\nNama: ${data.name}\nPeran: Guru Umum\nMapel: ${mapel}`);
+                    }, 500);
+                }
+            } catch (err) {
+                showToast('Terjadi kesalahan koneksi database', 'error');
+                console.error(err);
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    </script>
+</body>
+</html>
