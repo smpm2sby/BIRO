@@ -28,7 +28,6 @@
 
     <!-- PROTEKSI HALAMAN / AUTH GUARD SCRIPT -->
     <script>
-        // Cek apakah data login ada di localStorage
         const sessionUser = localStorage.getItem('guru_umum_user');
         if (!sessionUser) {
             alert('Akses Ditolak! Anda harus login terlebih dahulu.');
@@ -85,7 +84,7 @@
                     Selamat Datang, <span id="welcome-name">Guru</span>!
                 </h2>
                 <p class="text-emerald-100/90 text-sm mt-2 max-w-2xl leading-relaxed">
-                    Kelola dan input materi pembelajaran harian Anda ke dalam database sistem dengan cepat dan terstruktur.
+                    Kelola dan input materi pembelajaran harian Anda beserta sasaran siswa ke dalam database sistem.
                 </p>
             </div>
         </div>
@@ -149,7 +148,7 @@
 
             <form id="materi-form" class="space-y-5">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Kolom: nama_guru_mapel (Dapat diketik manual) -->
+                    <!-- Kolom: nama_guru_mapel -->
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Nama Guru & Mapel</label>
                         <div class="relative">
@@ -161,7 +160,7 @@
                         </div>
                     </div>
 
-                    <!-- Kolom: jenis_materi (3 Opsi: BIRO UMUM, BIRO TKA, OLIMPIADE) -->
+                    <!-- Kolom: jenis_materi -->
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Jenis Materi</label>
                         <select id="input-jenis-materi" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium">
@@ -169,6 +168,46 @@
                             <option value="BIRO UMUM">BIRO UMUM</option>
                             <option value="BIRO TKA">BIRO TKA</option>
                             <option value="OLIMPIADE">OLIMPIADE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ROW BARU: PILIH KELAS & PILIH SISWA FROM TABLE 'students' -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-gray-100">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Pilih Kelas Siswa</label>
+                        <select id="input-kelas" onchange="fetchStudentsByClass()" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium">
+                            <option value="" disabled selected>-- Pilih Kelas --</option>
+                            <!-- Kelas 7 -->
+                            <option value="Kelas 7A">Kelas 7A</option>
+                            <option value="Kelas 7B">Kelas 7B</option>
+                            <option value="Kelas 7C">Kelas 7C</option>
+                            <option value="Kelas 7D">Kelas 7D</option>
+                            <option value="Kelas 7E">Kelas 7E</option>
+                            <option value="Kelas 7F">Kelas 7F</option>
+                            <!-- Kelas 8 -->
+                            <option value="Kelas 8A">Kelas 8A</option>
+                            <option value="Kelas 8B">Kelas 8B</option>
+                            <option value="Kelas 8C">Kelas 8C</option>
+                            <option value="Kelas 8D">Kelas 8D</option>
+                            <option value="Kelas 8E">Kelas 8E</option>
+                            <option value="Kelas 8F">Kelas 8F</option>
+                            <option value="Kelas 8G">Kelas 8G</option>
+                            <!-- Kelas 9 -->
+                            <option value="Kelas 9A">Kelas 9A</option>
+                            <option value="Kelas 9B">Kelas 9B</option>
+                            <option value="Kelas 9C">Kelas 9C</option>
+                            <option value="Kelas 9D">Kelas 9D</option>
+                            <option value="Kelas 9E">Kelas 9E</option>
+                            <option value="Kelas 9F">Kelas 9F</option>
+                            <option value="Kelas 9G">Kelas 9G</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Pilih Nama Siswa</label>
+                        <select id="input-siswa" required disabled class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium bg-gray-50">
+                            <option value="" disabled selected>-- Pilih Kelas Terlebih Dahulu --</option>
                         </select>
                     </div>
                 </div>
@@ -207,13 +246,14 @@
                         <tr class="bg-white text-gray-400 text-xs uppercase border-b border-gray-100 font-bold">
                             <th class="px-6 py-4">Waktu Input</th>
                             <th class="px-6 py-4">Guru & Mapel</th>
+                            <th class="px-6 py-4">Siswa & Kelas</th>
                             <th class="px-6 py-4">Jenis</th>
                             <th class="px-6 py-4">Isi Materi</th>
                         </tr>
                     </thead>
                     <tbody id="materi-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
                         <tr>
-                            <td colspan="4" class="px-6 py-8 text-center text-gray-400">
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-400">
                                 <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...
                             </td>
                         </tr>
@@ -237,36 +277,79 @@
 
         let currentUser = null;
 
-        // Inisialisasi Data Pengguna
         document.addEventListener('DOMContentLoaded', () => {
             const stored = localStorage.getItem('guru_umum_user');
             if (stored) {
                 currentUser = JSON.parse(stored);
                 
-                // Tampilkan data ke UI
                 document.getElementById('user-display-name').textContent = currentUser.name || 'Guru Umum';
                 document.getElementById('welcome-name').textContent = currentUser.name || 'Guru Umum';
                 document.getElementById('user-display-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
                 document.getElementById('stat-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
-                
-                // Kosongkan input agar tidak terisi otomatis saat refresh
                 document.getElementById('input-guru-mapel').value = '';
         
-                // Tanggal Hari Ini
                 const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('stat-date').textContent = today;
         
-                // Muat daftar materi tersimpan
                 loadMateriList();
             }
         });
 
-        // Simpan Data Ke Tabel guru_umum di Supabase
+        // AMBIL DAFTAR SISWA BERDASARKAN KELAS DARI TABEL 'students'
+        async function fetchStudentsByClass() {
+            const classVal = document.getElementById('input-kelas').value;
+            const siswaSelect = document.getElementById('input-siswa');
+
+            siswaSelect.innerHTML = '<option value="" disabled selected>-- Memuat Siswa... --</option>';
+            siswaSelect.disabled = true;
+            siswaSelect.classList.add('bg-gray-50');
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .eq('class', classVal)
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+
+                siswaSelect.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+
+                if (!data || data.length === 0) {
+                    siswaSelect.innerHTML = '<option value="" disabled selected>-- Tidak ada siswa di kelas ini --</option>';
+                    return;
+                }
+
+                data.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = `${s.name} (${s.id})`;
+                    opt.dataset.name = s.name;
+                    siswaSelect.appendChild(opt);
+                });
+
+                siswaSelect.disabled = false;
+                siswaSelect.classList.remove('bg-gray-50');
+
+            } catch (err) {
+                console.error(err);
+                showToast('Gagal memuat daftar siswa!', 'error');
+                siswaSelect.innerHTML = '<option value="" disabled selected>-- Gagal Memuat Siswa --</option>';
+            }
+        }
+
+        // SIMPAN DATA KE TABEL guru_umum SUPABASE
         document.getElementById('materi-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const namaGuruMapel = document.getElementById('input-guru-mapel').value.trim();
             const jenisMateri = document.getElementById('input-jenis-materi').value;
             const materiText = document.getElementById('input-materi').value.trim();
+            const className = document.getElementById('input-kelas').value;
+
+            const siswaSelect = document.getElementById('input-siswa');
+            const studentId = siswaSelect.value;
+            const selectedOpt = siswaSelect.options[siswaSelect.selectedIndex];
+            const studentName = selectedOpt ? selectedOpt.dataset.name : '';
 
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
@@ -274,14 +357,17 @@
             btn.disabled = true;
 
             try {
-                // Insert ke tabel guru_umum
                 const { data, error } = await supabaseClient
                     .from('guru_umum')
                     .insert([
                         {
                             nama_guru_mapel: namaGuruMapel,
                             jenis_materi: jenisMateri,
-                            materi: materiText
+                            materi: materiText,
+                            class_name: className,
+                            student_id: studentId,
+                            student_name: studentName,
+                            status: 'Pending'
                         }
                     ]);
 
@@ -292,6 +378,11 @@
                     showToast('Materi berhasil disimpan ke database!', 'success');
                     document.getElementById('input-materi').value = '';
                     document.getElementById('input-jenis-materi').selectedIndex = 0;
+                    document.getElementById('input-kelas').selectedIndex = 0;
+                    siswaSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kelas Terlebih Dahulu --</option>';
+                    siswaSelect.disabled = true;
+                    siswaSelect.classList.add('bg-gray-50');
+                    
                     loadMateriList();
                 }
             } catch (err) {
@@ -303,10 +394,10 @@
             btn.disabled = false;
         });
 
-        // Ambil Data dari Tabel guru_umum
+        // AMBIL RIWAYAT DATA GURU UMUM
         async function loadMateriList() {
             const tbody = document.getElementById('materi-table-body');
-            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...</td></tr>';
 
             try {
                 const { data, error } = await supabaseClient
@@ -319,7 +410,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Belum ada materi pembelajaran yang disimpan.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada materi pembelajaran yang disimpan.</td></tr>';
                     return;
                 }
 
@@ -328,7 +419,6 @@
                         day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
 
-                    // Pewarnaan Badge berdasarkan 3 Jenis Materi
                     let badgeColor = 'bg-emerald-100 text-emerald-800';
                     if (item.jenis_materi === 'BIRO TKA') badgeColor = 'bg-blue-100 text-blue-800';
                     if (item.jenis_materi === 'OLIMPIADE') badgeColor = 'bg-purple-100 text-purple-800';
@@ -337,6 +427,9 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 font-medium">${tgl}</td>
                             <td class="px-6 py-4 font-semibold text-gray-900">${item.nama_guru_mapel || '-'}</td>
+                            <td class="px-6 py-4 text-xs font-medium text-gray-800">
+                                ${item.student_name ? `${item.student_name} <span class="text-xs text-gray-400 font-normal">(${item.class_name || '-'})</span>` : '-'}
+                            </td>
                             <td class="px-6 py-4">
                                 <span class="${badgeColor} px-2.5 py-1 rounded-md text-xs font-bold">${item.jenis_materi || 'BIRO UMUM'}</span>
                             </td>
@@ -348,11 +441,10 @@
 
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-red-500 font-medium">Gagal mengambil data materi dari Supabase.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-red-500 font-medium">Gagal mengambil data materi dari Supabase.</td></tr>';
             }
         }
 
-        // Logout
         function logoutGuruUmum() {
             if (confirm('Apakah Anda yakin ingin keluar?')) {
                 localStorage.removeItem('guru_umum_user');
