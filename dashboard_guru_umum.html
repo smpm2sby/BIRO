@@ -249,13 +249,13 @@
                 document.getElementById('user-display-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
                 document.getElementById('stat-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
                 
-                // Set isi awal field input (guru tetap bebas mengubahnya)
-                document.getElementById('input-guru-mapel').value = `${currentUser.name} (${currentUser.mapel || 'Umum'})`;
-
+                // Kosongkan input agar tidak terisi otomatis saat refresh
+                document.getElementById('input-guru-mapel').value = '';
+        
                 // Tanggal Hari Ini
                 const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('stat-date').textContent = today;
-
+        
                 // Muat daftar materi tersimpan
                 loadMateriList();
             }
