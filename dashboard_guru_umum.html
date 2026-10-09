@@ -133,7 +133,7 @@
             </div>
         </div>
 
-        <!-- FORM INPUT MATERI PEMBELAJARAN (TERINTEGRASI TABEL guru_umum) -->
+        <!-- FORM INPUT MATERI PEMBELAJARAN -->
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
                 <div class="flex items-center space-x-3">
@@ -149,26 +149,26 @@
 
             <form id="materi-form" class="space-y-5">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Kolom: nama_guru_mapel -->
+                    <!-- Kolom: nama_guru_mapel (Dapat diketik manual) -->
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Nama Guru & Mapel</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
                                 <i class="fas fa-user-tag"></i>
                             </span>
-                            <input type="text" id="input-guru-mapel" required readonly
-                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 font-semibold text-sm outline-none">
+                            <input type="text" id="input-guru-mapel" required placeholder="Ketik nama guru & mapel..."
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-gray-800 font-medium text-sm transition-all">
                         </div>
                     </div>
 
-                    <!-- Kolom: jenis_materi -->
+                    <!-- Kolom: jenis_materi (3 Opsi: BIRO UMUM, BIRO TKA, OLIMPIADE) -->
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Jenis Materi</label>
                         <select id="input-jenis-materi" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium">
                             <option value="" disabled selected>-- Pilih Jenis Materi --</option>
-                            <option value="Materi">BIRO UMUM</option>
-                            <option value="Tugas">BIRO TKA</option>
-                            <option value="Kuis">OLIMPIADE</option>
+                            <option value="BIRO UMUM">BIRO UMUM</option>
+                            <option value="BIRO TKA">BIRO TKA</option>
+                            <option value="OLIMPIADE">OLIMPIADE</option>
                         </select>
                     </div>
                 </div>
@@ -176,7 +176,7 @@
                 <!-- Kolom: materi -->
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Isi Ringkasan Materi</label>
-                    <textarea id="input-materi" rows="4" required placeholder="Tuliskan judul, deskripsi, atau tautan materi pembelajaran di sini..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></textarea>
+                    <textarea id="input-materi" rows="4" required placeholder="Tuliskan materi pelajaran, modul, atau catatan aktivitas di sini..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></textarea>
                 </div>
 
                 <div class="flex justify-end pt-2">
@@ -194,7 +194,7 @@
                     <div class="bg-teal-100 text-teal-700 p-2 rounded-lg">
                         <i class="fas fa-list-alt text-base"></i>
                     </div>
-                    <h3 class="font-bold text-gray-800">Daftar Materi Terimpan</h3>
+                    <h3 class="font-bold text-gray-800">Daftar Materi Tersimpan</h3>
                 </div>
                 <button onclick="loadMateriList()" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center">
                     <i class="fas fa-sync-alt mr-1"></i> Refresh Data
@@ -249,7 +249,7 @@
                 document.getElementById('user-display-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
                 document.getElementById('stat-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
                 
-                // Set otomatis field nama_guru_mapel
+                // Set isi awal field input (guru tetap bebas mengubahnya)
                 document.getElementById('input-guru-mapel').value = `${currentUser.name} (${currentUser.mapel || 'Umum'})`;
 
                 // Tanggal Hari Ini
@@ -264,9 +264,9 @@
         // Simpan Data Ke Tabel guru_umum di Supabase
         document.getElementById('materi-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const namaGuruMapel = document.getElementById('input-guru-mapel').value;
+            const namaGuruMapel = document.getElementById('input-guru-mapel').value.trim();
             const jenisMateri = document.getElementById('input-jenis-materi').value;
-            const materiText = document.getElementById('input-materi').value;
+            const materiText = document.getElementById('input-materi').value.trim();
 
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
@@ -328,17 +328,17 @@
                         day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
 
-                    let badgeColor = 'bg-blue-100 text-blue-700';
-                    if (item.jenis_materi === 'Tugas') badgeColor = 'bg-yellow-100 text-yellow-700';
-                    if (item.jenis_materi === 'Kuis') badgeColor = 'bg-purple-100 text-purple-700';
-                    if (item.jenis_materi === 'Ujian') badgeColor = 'bg-red-100 text-red-700';
+                    // Pewarnaan Badge berdasarkan 3 Jenis Materi
+                    let badgeColor = 'bg-emerald-100 text-emerald-800';
+                    if (item.jenis_materi === 'BIRO TKA') badgeColor = 'bg-blue-100 text-blue-800';
+                    if (item.jenis_materi === 'OLIMPIADE') badgeColor = 'bg-purple-100 text-purple-800';
 
                     const rowHtml = `
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 font-medium">${tgl}</td>
                             <td class="px-6 py-4 font-semibold text-gray-900">${item.nama_guru_mapel || '-'}</td>
                             <td class="px-6 py-4">
-                                <span class="${badgeColor} px-2.5 py-1 rounded-md text-xs font-bold">${item.jenis_materi || 'Materi'}</span>
+                                <span class="${badgeColor} px-2.5 py-1 rounded-md text-xs font-bold">${item.jenis_materi || 'BIRO UMUM'}</span>
                             </td>
                             <td class="px-6 py-4 text-gray-700 text-xs leading-relaxed">${item.materi || '-'}</td>
                         </tr>
