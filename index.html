@@ -88,7 +88,6 @@
                     <h2 class="font-bold text-lg text-gray-800">Panel Guru</h2>
                 </div>
 
-                <!-- TAB NAVIGASI GURU -->
                 <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl">
                     <button id="btn-guru-tab-absensi" onclick="switchGuruTab('absensi')" class="px-4 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-blue-600 transition-all">
                         <i class="fas fa-clipboard-user mr-1.5"></i> Presensi Kelas
@@ -248,11 +247,9 @@
                     </div>
                 </div>
 
-                <!-- SECTION 2: MATERI GURU UMUM (DENGAN SEARCH BAR) -->
+                <!-- SECTION 2: MATERI GURU UMUM -->
                 <div id="guru-section-materi" class="hidden">
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        
-                        <!-- HEADER MATERI DENGAN SEARCH BAR -->
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
                             <div>
                                 <h3 class="font-bold text-gray-900 text-lg">Materi Pembelajaran Guru Umum</h3>
@@ -260,9 +257,8 @@
                             </div>
                             
                             <div class="flex items-center space-x-2 w-full sm:w-auto">
-                                <!-- SEARCH BAR MATERI -->
                                 <div class="relative flex-1 sm:w-64">
-                                    <input type="text" id="guru-materi-search" oninput="filterApprovedMateriGuru()" placeholder="Cari nama guru, mapel, materi..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                    <input type="text" id="guru-materi-search" oninput="filterApprovedMateriGuru()" placeholder="Cari guru, siswa, kelas, materi..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                                     <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
                                 </div>
                                 <button onclick="loadApprovedMateriForGuru()" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-2 rounded-xl font-semibold transition-colors whitespace-nowrap">
@@ -271,7 +267,6 @@
                             </div>
                         </div>
 
-                        <!-- CONTAINER CARD MATERI -->
                         <div id="guru-materi-approved-wrapper" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="col-span-2 text-center py-8 text-gray-400">
                                 <i class="fas fa-spinner fa-spin text-xl mr-2"></i> Memuat materi disetujui...
@@ -293,7 +288,6 @@
                     <h2 class="font-bold text-lg">Dashboard Admin</h2>
                 </div>
 
-                <!-- TAB NAVIGASI ADMIN -->
                 <div class="flex space-x-2 bg-gray-800 p-1 rounded-xl">
                     <button id="btn-admin-tab-laporan" onclick="switchAdminTab('laporan')" class="px-4 py-2 text-xs font-bold rounded-lg bg-gray-900 text-white transition-all">
                         <i class="fas fa-file-alt mr-1.5"></i> Laporan Absensi
@@ -511,6 +505,7 @@
                                     <tr class="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-200 font-bold">
                                         <th class="px-4 py-3">Tanggal</th>
                                         <th class="px-4 py-3">Guru & Mapel</th>
+                                        <th class="px-4 py-3">Siswa & Kelas</th>
                                         <th class="px-4 py-3">Jenis Materi</th>
                                         <th class="px-4 py-3">Isi Materi</th>
                                         <th class="px-4 py-3 text-center">Status</th>
@@ -519,7 +514,7 @@
                                 </thead>
                                 <tbody id="approval-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
                                     <tr>
-                                        <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                                        <td colspan="7" class="px-6 py-8 text-center text-gray-400">
                                             <i class="fas fa-spinner fa-spin mr-2"></i> Memuat daftar pengajuan materi...
                                         </td>
                                     </tr>
@@ -543,11 +538,10 @@
 
         let currentUser = null;
         let currentReportData = [];
-        let approvedMateriData = []; // Menyimpan master data materi disetujui untuk pencarian
+        let approvedMateriData = [];
         let sortColumnKey = null;
         let sortAscending = true;
 
-        // Custom Date & Time Picker Setup
         const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -804,7 +798,6 @@
             }, 3000);
         }
 
-        // --- NAVIGASI TAB ADMIN ---
         function switchAdminTab(tab) {
             const secLaporan = document.getElementById('admin-section-laporan');
             const secPersetujuan = document.getElementById('admin-section-persetujuan');
@@ -825,7 +818,6 @@
             }
         }
 
-        // --- NAVIGASI TAB GURU ---
         function switchGuruTab(tab) {
             const secAbsensi = document.getElementById('guru-section-absensi');
             const secMateri = document.getElementById('guru-section-materi');
@@ -846,10 +838,10 @@
             }
         }
 
-        // --- PERSETUJUAN ADMIN MATERI GURU UMUM ---
+        // --- ADMIN PERSETUJUAN MATERI ---
         async function loadApprovalList() {
             const tbody = document.getElementById('approval-table-body');
-            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data persetujuan...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data persetujuan...</td></tr>';
 
             try {
                 const { data, error } = await supabaseClient
@@ -862,7 +854,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">Belum ada pengajuan materi dari Guru Umum.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">Belum ada pengajuan materi dari Guru Umum.</td></tr>';
                     return;
                 }
 
@@ -883,18 +875,21 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500 font-medium">${tgl}</td>
                             <td class="px-4 py-3 font-semibold text-gray-900">${item.nama_guru_mapel || '-'}</td>
+                            <td class="px-4 py-3 text-xs font-medium text-gray-800">
+                                ${item.student_name ? `${item.student_name} <br><span class="text-[11px] text-gray-400">(${item.class_name || '-'})</span>` : '-'}
+                            </td>
                             <td class="px-4 py-3 font-medium text-xs text-blue-600">${item.jenis_materi || 'BIRO UMUM'}</td>
                             <td class="px-4 py-3 text-xs text-gray-700 leading-relaxed max-w-xs">${item.materi || '-'}</td>
                             <td class="px-4 py-3 text-center">${statusBadge}</td>
                             <td class="px-4 py-3 text-center whitespace-nowrap">
                                 <div class="flex items-center justify-center space-x-1">
-                                    <button onclick="updateMateriStatus(${item.id}, 'Disetujui')" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors shadow-sm" title="Setujui Materi">
+                                    <button onclick="updateMateriStatus(${item.id}, 'Disetujui')" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors shadow-sm" title="Setujui">
                                         <i class="fas fa-check mr-1"></i> Setujui
                                     </button>
-                                    <button onclick="updateMateriStatus(${item.id}, 'Ditolak')" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors shadow-sm" title="Tolak Materi">
+                                    <button onclick="updateMateriStatus(${item.id}, 'Ditolak')" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors shadow-sm" title="Tolak">
                                         <i class="fas fa-times mr-1"></i> Tolak
                                     </button>
-                                    <button onclick="deleteGuruUmumRecord(${item.id})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors" title="Hapus Permanen">
+                                    <button onclick="deleteGuruUmumRecord(${item.id})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors" title="Hapus">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -906,7 +901,7 @@
 
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500 font-medium">Gagal memuat daftar pengajuan materi.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500 font-medium">Gagal memuat daftar pengajuan materi.</td></tr>';
             }
         }
 
@@ -919,7 +914,7 @@
 
                 if (error) throw error;
 
-                showToast(`Materi berhasil di-set menjadi: ${newStatus}`, 'success');
+                showToast(`Status materi berhasil diubah ke: ${newStatus}`, 'success');
                 loadApprovalList();
             } catch (err) {
                 console.error(err);
@@ -928,7 +923,7 @@
         }
 
         async function deleteGuruUmumRecord(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus data pengajuan materi ini?')) return;
+            if (!confirm('Apakah Anda yakin ingin menghapus pengajuan materi ini?')) return;
             try {
                 const { error } = await supabaseClient
                     .from('guru_umum')
@@ -945,7 +940,7 @@
             }
         }
 
-        // --- AMBIL & PENCARIAN MATERI GURU UMUM DISUETUJUI (PANEL GURU) ---
+        // --- PANEL GURU: PENAYANGAN MATERI DISETUJUI ---
         async function loadApprovedMateriForGuru() {
             const container = document.getElementById('guru-materi-approved-wrapper');
             container.innerHTML = '<div class="col-span-2 text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-xl mr-2"></i> Memuat materi disetujui...</div>';
@@ -961,7 +956,6 @@
 
                 approvedMateriData = data || [];
                 
-                // Reset kolom pencarian saat direfresh
                 const searchInput = document.getElementById('guru-materi-search');
                 if (searchInput) searchInput.value = '';
 
@@ -973,7 +967,6 @@
             }
         }
 
-        // FUNGSI LOGIKA FILTER SEARCH BAR MATERI
         function filterApprovedMateriGuru() {
             const query = (document.getElementById('guru-materi-search').value || '').toLowerCase().trim();
             
@@ -986,14 +979,15 @@
                 const guruMapel = (item.nama_guru_mapel || '').toLowerCase();
                 const jenis = (item.jenis_materi || '').toLowerCase();
                 const materi = (item.materi || '').toLowerCase();
+                const student = (item.student_name || '').toLowerCase();
+                const kelas = (item.class_name || '').toLowerCase();
 
-                return guruMapel.includes(query) || jenis.includes(query) || materi.includes(query);
+                return guruMapel.includes(query) || jenis.includes(query) || materi.includes(query) || student.includes(query) || kelas.includes(query);
             });
 
             renderApprovedMateriList(filtered);
         }
 
-        // FUNGSI RENDER CARD MATERI
         function renderApprovedMateriList(data) {
             const container = document.getElementById('guru-materi-approved-wrapper');
             container.innerHTML = '';
@@ -1002,7 +996,7 @@
                 container.innerHTML = `
                     <div class="col-span-2 text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                         <i class="fas fa-search text-3xl text-gray-300 mb-2"></i>
-                        <p class="text-sm text-gray-500 font-medium">Tidak ada materi yang cocok dengan kata kunci pencarian Anda.</p>
+                        <p class="text-sm text-gray-500 font-medium">Tidak ada materi yang cocok dengan pencarian Anda.</p>
                     </div>
                 `;
                 return;
@@ -1024,8 +1018,11 @@
                                 <span class="${badgeColor} text-[11px] font-extrabold px-2.5 py-1 rounded-lg">${item.jenis_materi || 'BIRO UMUM'}</span>
                                 <span class="text-[11px] font-medium text-gray-400">${tgl}</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 text-sm mb-1">${item.nama_guru_mapel || 'Guru Umum'}</h4>
-                            <p class="text-xs text-gray-600 leading-relaxed bg-white p-3.5 rounded-xl border border-gray-100 mt-2">${item.materi || '-'}</p>
+                            <h4 class="font-bold text-gray-900 text-sm mb-0.5">${item.nama_guru_mapel || 'Guru Umum'}</h4>
+                            <p class="text-xs text-indigo-600 font-semibold mb-2">
+                                <i class="fas fa-user-graduate mr-1"></i> ${item.student_name ? `${item.student_name} (${item.class_name || '-'})` : 'Semua Siswa'}
+                            </p>
+                            <p class="text-xs text-gray-600 leading-relaxed bg-white p-3.5 rounded-xl border border-gray-100">${item.materi || '-'}</p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-end">
                             <span class="text-[10px] text-green-600 font-bold flex items-center">
@@ -1038,7 +1035,7 @@
             });
         }
 
-        // PROSES LOGIN
+        // PROSES LOGIN & LAINNYA
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const role = document.getElementById('login-role').value;
@@ -1096,7 +1093,6 @@
             showToast('Anda telah keluar', 'info');
         }
 
-        // TAMPILKAN SISWA & ABSENSI
         async function loadStudents() {
             const className = document.getElementById('guru-class').value;
             const dateStr = document.getElementById('guru-date').value;
@@ -1181,7 +1177,6 @@
             }
         }
 
-        // SIMPAN ABSENSI
         document.getElementById('attendance-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1236,7 +1231,6 @@
             btn.disabled = false;
         });
 
-        // LAPORAN ADMIN
         async function loadReport() {
             const className = document.getElementById('admin-class').value;
             const startDate = document.getElementById('admin-start-date').value;
