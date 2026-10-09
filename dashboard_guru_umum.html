@@ -26,7 +26,7 @@
 </head>
 <body class="text-gray-800 flex flex-col min-h-screen">
 
-    <!-- PROTEKSI HALAMAN / AUTH GUARD SCRIPT (Berjalan Sebelum Halaman Di-render) -->
+    <!-- PROTEKSI HALAMAN / AUTH GUARD SCRIPT -->
     <script>
         // Cek apakah data login ada di localStorage
         const sessionUser = localStorage.getItem('guru_umum_user');
@@ -85,7 +85,7 @@
                     Selamat Datang, <span id="welcome-name">Guru</span>!
                 </h2>
                 <p class="text-emerald-100/90 text-sm mt-2 max-w-2xl leading-relaxed">
-                    Kelola jadwal presensi siswa, catat jurnal mengajar harian, serta pantau aktivitas pembelajaran kelas umum dengan mudah.
+                    Kelola dan input materi pembelajaran harian Anda ke dalam database sistem dengan cepat dan terstruktur.
                 </p>
             </div>
         </div>
@@ -133,57 +133,94 @@
             </div>
         </div>
 
-        <!-- FORM JURNAL MENGAJAR & REKAP PRESTASI (PANEL FITUR) -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        <!-- FORM INPUT MATERI PEMBELAJARAN (TERINTEGRASI TABEL guru_umum) -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
                 <div class="flex items-center space-x-3">
                     <div class="bg-emerald-100 text-emerald-700 p-2.5 rounded-xl">
-                        <i class="fas fa-pen-square text-lg"></i>
+                        <i class="fas fa-folder-plus text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-900 text-lg">Jurnal Pembelajaran Harian</h3>
-                        <p class="text-xs text-gray-500">Isi ringkasan materi dan aktivitas kelas yang Anda ampu hari ini</p>
+                        <h3 class="font-bold text-gray-900 text-lg">Input Materi Pembelajaran</h3>
+                        <p class="text-xs text-gray-500">Masukkan ringkasan materi atau modul yang akan disimpan ke database `guru_umum`</p>
                     </div>
                 </div>
             </div>
 
-            <form id="journal-form" class="space-y-5">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <form id="materi-form" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Kolom: nama_guru_mapel -->
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Pilih Kelas</label>
-                        <select id="jurnal-kelas" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
-                            <option value="" disabled selected>-- Pilih Kelas --</option>
-                            <option value="Kelas 7A">Kelas 7A</option>
-                            <option value="Kelas 7B">Kelas 7B</option>
-                            <option value="Kelas 8A">Kelas 8A</option>
-                            <option value="Kelas 8B">Kelas 8B</option>
-                            <option value="Kelas 9A">Kelas 9A</option>
-                            <option value="Kelas 9B">Kelas 9B</option>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Nama Guru & Mapel</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+                                <i class="fas fa-user-tag"></i>
+                            </span>
+                            <input type="text" id="input-guru-mapel" required readonly
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 font-semibold text-sm outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Kolom: jenis_materi -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Jenis Materi</label>
+                        <select id="input-jenis-materi" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium">
+                            <option value="" disabled selected>-- Pilih Jenis Materi --</option>
+                            <option value="Materi">Materi / Modul Pembelajaran</option>
+                            <option value="Tugas">Tugas / PR</option>
+                            <option value="Kuis">Kuis / Latihan Soal</option>
+                            <option value="Ujian">Ujian / Assessment</option>
                         </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Mata Pelajaran</label>
-                        <input type="text" id="jurnal-mapel" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm font-semibold">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Jam Ke- / Pertemuan</label>
-                        <input type="text" id="jurnal-jam" placeholder="Contoh: Jam 1 - 2 (Ke-3)" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
                     </div>
                 </div>
 
+                <!-- Kolom: materi -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Topik & Ringkasan Materi</label>
-                    <textarea id="jurnal-materi" rows="3" required placeholder="Tuliskan materi pelajaran dan catatan aktivitas siswa..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></textarea>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Isi Ringkasan Materi</label>
+                    <textarea id="input-materi" rows="4" required placeholder="Tuliskan judul, deskripsi, atau tautan materi pembelajaran di sini..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></textarea>
                 </div>
 
                 <div class="flex justify-end pt-2">
-                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all flex items-center text-sm">
-                        <i class="fas fa-save mr-2"></i> Simpan Jurnal
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center text-sm transform hover:-translate-y-0.5">
+                        <i class="fas fa-paper-plane mr-2"></i> Simpan Ke Database
                     </button>
                 </div>
             </form>
+        </div>
+
+        <!-- TABEL RIWAYAT MATERI PEMBELAJARAN -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-teal-100 text-teal-700 p-2 rounded-lg">
+                        <i class="fas fa-list-alt text-base"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800">Daftar Materi Terimpan</h3>
+                </div>
+                <button onclick="loadMateriList()" class="text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center">
+                    <i class="fas fa-sync-alt mr-1"></i> Refresh Data
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white text-gray-400 text-xs uppercase border-b border-gray-100 font-bold">
+                            <th class="px-6 py-4">Waktu Input</th>
+                            <th class="px-6 py-4">Guru & Mapel</th>
+                            <th class="px-6 py-4">Jenis</th>
+                            <th class="px-6 py-4">Isi Materi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materi-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-400">
+                                <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </main>
@@ -201,26 +238,122 @@
 
         let currentUser = null;
 
-        // Inisialisasi Data Pengguna dari LocalStorage
+        // Inisialisasi Data Pengguna
         document.addEventListener('DOMContentLoaded', () => {
             const stored = localStorage.getItem('guru_umum_user');
             if (stored) {
                 currentUser = JSON.parse(stored);
                 
-                // Tampilkan ke UI
+                // Tampilkan data ke UI
                 document.getElementById('user-display-name').textContent = currentUser.name || 'Guru Umum';
                 document.getElementById('welcome-name').textContent = currentUser.name || 'Guru Umum';
                 document.getElementById('user-display-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
                 document.getElementById('stat-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
-                document.getElementById('jurnal-mapel').value = currentUser.mapel || 'Mata Pelajaran';
+                
+                // Set otomatis field nama_guru_mapel
+                document.getElementById('input-guru-mapel').value = `${currentUser.name} (${currentUser.mapel || 'Umum'})`;
 
                 // Tanggal Hari Ini
                 const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('stat-date').textContent = today;
+
+                // Muat daftar materi tersimpan
+                loadMateriList();
             }
         });
 
-        // Fungsi Logout Guru Umum
+        // Simpan Data Ke Tabel guru_umum di Supabase
+        document.getElementById('materi-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const namaGuruMapel = document.getElementById('input-guru-mapel').value;
+            const jenisMateri = document.getElementById('input-jenis-materi').value;
+            const materiText = document.getElementById('input-materi').value;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
+            btn.disabled = true;
+
+            try {
+                // Insert ke tabel guru_umum
+                const { data, error } = await supabaseClient
+                    .from('guru_umum')
+                    .insert([
+                        {
+                            nama_guru_mapel: namaGuruMapel,
+                            jenis_materi: jenisMateri,
+                            materi: materiText
+                        }
+                    ]);
+
+                if (error) {
+                    console.error(error);
+                    showToast('Gagal menyimpan materi: ' + error.message, 'error');
+                } else {
+                    showToast('Materi berhasil disimpan ke database!', 'success');
+                    document.getElementById('input-materi').value = '';
+                    document.getElementById('input-jenis-materi').selectedIndex = 0;
+                    loadMateriList();
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Terjadi kesalahan sistem', 'error');
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+
+        // Ambil Data dari Tabel guru_umum
+        async function loadMateriList() {
+            const tbody = document.getElementById('materi-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...</td></tr>';
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('guru_umum')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                tbody.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Belum ada materi pembelajaran yang disimpan.</td></tr>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const tgl = new Date(item.created_at).toLocaleString('id-ID', {
+                        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    let badgeColor = 'bg-blue-100 text-blue-700';
+                    if (item.jenis_materi === 'Tugas') badgeColor = 'bg-yellow-100 text-yellow-700';
+                    if (item.jenis_materi === 'Kuis') badgeColor = 'bg-purple-100 text-purple-700';
+                    if (item.jenis_materi === 'Ujian') badgeColor = 'bg-red-100 text-red-700';
+
+                    const rowHtml = `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 font-medium">${tgl}</td>
+                            <td class="px-6 py-4 font-semibold text-gray-900">${item.nama_guru_mapel || '-'}</td>
+                            <td class="px-6 py-4">
+                                <span class="${badgeColor} px-2.5 py-1 rounded-md text-xs font-bold">${item.jenis_materi || 'Materi'}</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-700 text-xs leading-relaxed">${item.materi || '-'}</td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', rowHtml);
+                });
+
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-red-500 font-medium">Gagal mengambil data materi dari Supabase.</td></tr>';
+            }
+        }
+
+        // Logout
         function logoutGuruUmum() {
             if (confirm('Apakah Anda yakin ingin keluar?')) {
                 localStorage.removeItem('guru_umum_user');
@@ -251,17 +384,6 @@
                 toast.classList.add('hidden');
             }, 3000);
         }
-
-        // Submit Jurnal Mengajar
-        document.getElementById('journal-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const kelas = document.getElementById('jurnal-kelas').value;
-            const materi = document.getElementById('jurnal-materi').value;
-
-            showToast(`Jurnal untuk ${kelas} berhasil disimpan!`, 'success');
-            e.target.reset();
-            document.getElementById('jurnal-mapel').value = currentUser ? currentUser.mapel : '';
-        });
     </script>
 </body>
 </html>
