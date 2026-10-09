@@ -147,8 +147,21 @@
             </div>
 
             <form id="materi-form" class="space-y-5">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Kolom: nama_guru_mapel -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    
+                    <!-- 1. MATA PELAJARAN (DROPDOWN DI AWAL FORM) -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Mata Pelajaran</label>
+                        <select id="input-mapel" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium">
+                            <option value="" disabled selected>-- Pilih Mata Pelajaran --</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="IPA">IPA</option>
+                            <option value="Matematika">Matematika</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. NAMA GURU & MAPEL -->
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Nama Guru & Mapel</label>
                         <div class="relative">
@@ -160,7 +173,7 @@
                         </div>
                     </div>
 
-                    <!-- Kolom: jenis_materi -->
+                    <!-- 3. JENIS MATERI -->
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Jenis Materi</label>
                         <select id="input-jenis-materi" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium">
@@ -172,20 +185,18 @@
                     </div>
                 </div>
 
-                <!-- ROW BARU: PILIH KELAS & PILIH SISWA FROM TABLE 'students' -->
+                <!-- PILIH KELAS & PILIH SISWA FROM TABLE 'students' -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-gray-100">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Pilih Kelas Siswa</label>
                         <select id="input-kelas" onchange="fetchStudentsByClass()" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium">
                             <option value="" disabled selected>-- Pilih Kelas --</option>
-                            <!-- Kelas 7 -->
                             <option value="Kelas 7A">Kelas 7A</option>
                             <option value="Kelas 7B">Kelas 7B</option>
                             <option value="Kelas 7C">Kelas 7C</option>
                             <option value="Kelas 7D">Kelas 7D</option>
                             <option value="Kelas 7E">Kelas 7E</option>
                             <option value="Kelas 7F">Kelas 7F</option>
-                            <!-- Kelas 8 -->
                             <option value="Kelas 8A">Kelas 8A</option>
                             <option value="Kelas 8B">Kelas 8B</option>
                             <option value="Kelas 8C">Kelas 8C</option>
@@ -193,7 +204,6 @@
                             <option value="Kelas 8E">Kelas 8E</option>
                             <option value="Kelas 8F">Kelas 8F</option>
                             <option value="Kelas 8G">Kelas 8G</option>
-                            <!-- Kelas 9 -->
                             <option value="Kelas 9A">Kelas 9A</option>
                             <option value="Kelas 9B">Kelas 9B</option>
                             <option value="Kelas 9C">Kelas 9C</option>
@@ -212,9 +222,9 @@
                     </div>
                 </div>
 
-                <!-- Kolom: materi -->
+                <!-- ISI MATERI -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Hambatan Belajar</label>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Isi Ringkasan Materi</label>
                     <textarea id="input-materi" rows="4" required placeholder="Tuliskan materi pelajaran, modul, atau catatan aktivitas di sini..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></textarea>
                 </div>
 
@@ -245,6 +255,7 @@
                     <thead>
                         <tr class="bg-white text-gray-400 text-xs uppercase border-b border-gray-100 font-bold">
                             <th class="px-6 py-4">Waktu Input</th>
+                            <th class="px-6 py-4">Mata Pelajaran</th>
                             <th class="px-6 py-4">Guru & Mapel</th>
                             <th class="px-6 py-4">Siswa & Kelas</th>
                             <th class="px-6 py-4">Jenis</th>
@@ -253,7 +264,7 @@
                     </thead>
                     <tbody id="materi-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-400">
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-400">
                                 <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...
                             </td>
                         </tr>
@@ -295,7 +306,6 @@
             }
         });
 
-        // AMBIL DAFTAR SISWA BERDASARKAN KELAS DARI TABEL 'students'
         async function fetchStudentsByClass() {
             const classVal = document.getElementById('input-kelas').value;
             const siswaSelect = document.getElementById('input-siswa');
@@ -338,9 +348,10 @@
             }
         }
 
-        // SIMPAN DATA KE TABEL guru_umum SUPABASE
+        // SIMPAN DATA KE SUPABASE (MENAMBAHKAN MATA PELAJARAN)
         document.getElementById('materi-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const mapelVal = document.getElementById('input-mapel').value;
             const namaGuruMapel = document.getElementById('input-guru-mapel').value.trim();
             const jenisMateri = document.getElementById('input-jenis-materi').value;
             const materiText = document.getElementById('input-materi').value.trim();
@@ -361,6 +372,7 @@
                     .from('guru_umum')
                     .insert([
                         {
+                            mata_pelajaran: mapelVal,
                             nama_guru_mapel: namaGuruMapel,
                             jenis_materi: jenisMateri,
                             materi: materiText,
@@ -376,6 +388,7 @@
                     showToast('Gagal menyimpan materi: ' + error.message, 'error');
                 } else {
                     showToast('Materi berhasil disimpan ke database!', 'success');
+                    document.getElementById('input-mapel').selectedIndex = 0;
                     document.getElementById('input-materi').value = '';
                     document.getElementById('input-jenis-materi').selectedIndex = 0;
                     document.getElementById('input-kelas').selectedIndex = 0;
@@ -394,10 +407,9 @@
             btn.disabled = false;
         });
 
-        // AMBIL RIWAYAT DATA GURU UMUM
         async function loadMateriList() {
             const tbody = document.getElementById('materi-table-body');
-            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data materi...</td></tr>';
 
             try {
                 const { data, error } = await supabaseClient
@@ -410,7 +422,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada materi pembelajaran yang disimpan.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">Belum ada materi pembelajaran yang disimpan.</td></tr>';
                     return;
                 }
 
@@ -426,6 +438,7 @@
                     const rowHtml = `
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 font-medium">${tgl}</td>
+                            <td class="px-6 py-4 font-bold text-xs text-emerald-700">${item.mata_pelajaran || '-'}</td>
                             <td class="px-6 py-4 font-semibold text-gray-900">${item.nama_guru_mapel || '-'}</td>
                             <td class="px-6 py-4 text-xs font-medium text-gray-800">
                                 ${item.student_name ? `${item.student_name} <span class="text-xs text-gray-400 font-normal">(${item.class_name || '-'})</span>` : '-'}
@@ -441,7 +454,7 @@
 
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-red-500 font-medium">Gagal mengambil data materi dari Supabase.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500 font-medium">Gagal mengambil data materi dari Supabase.</td></tr>';
             }
         }
 
