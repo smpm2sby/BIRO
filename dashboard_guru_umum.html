@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Guru Umum - SPEMDA</title>
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Library Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f8fafc;
+        }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(8px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+    </style>
+</head>
+<body class="text-gray-800 flex flex-col min-h-screen">
+
+    <!-- PROTEKSI HALAMAN / AUTH GUARD SCRIPT (Berjalan Sebelum Halaman Di-render) -->
+    <script>
+        // Cek apakah data login ada di localStorage
+        const sessionUser = localStorage.getItem('guru_umum_user');
+        if (!sessionUser) {
+            alert('Akses Ditolak! Anda harus login terlebih dahulu.');
+            window.location.href = 'guru_umum.html';
+        }
+    </script>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 z-50 hidden transform transition-all duration-300">
+        <div class="bg-gray-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 border border-gray-700">
+            <i id="toast-icon" class="fas fa-info-circle text-emerald-400"></i>
+            <span id="toast-message" class="font-medium text-sm">Notifikasi</span>
+        </div>
+    </div>
+
+    <!-- NAVBAR HEADER -->
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-500/20 p-2.5 rounded-xl border border-emerald-400/30">
+                    <i class="fas fa-chalkboard-teacher text-emerald-300 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Portal Guru Umum</h1>
+                    <p class="text-xs text-emerald-200/80">SMP Muhammadiyah 2 Surabaya</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <span id="user-display-name" class="font-bold text-sm block leading-tight">Nama Guru</span>
+                    <span id="user-display-mapel" class="text-xs text-emerald-300 font-medium">Mata Pelajaran</span>
+                </div>
+                <button onclick="logoutGuruUmum()" class="bg-red-500/80 hover:bg-red-600 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all flex items-center shadow-md">
+                    <i class="fas fa-sign-out-alt mr-1.5"></i> Keluar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- KONTEN UTAMA DASHBOARD -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 fade-in">
+        
+        <!-- Welcome Card -->
+        <div class="bg-gradient-to-r from-emerald-700 to-teal-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-bold select-none pointer-events-none">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="relative z-10">
+                <span class="inline-block bg-emerald-500/30 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full border border-emerald-400/30 mb-3">
+                    <i class="fas fa-id-badge mr-1"></i> Mode Pengajar Umum
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    Selamat Datang, <span id="welcome-name">Guru</span>!
+                </h2>
+                <p class="text-emerald-100/90 text-sm mt-2 max-w-2xl leading-relaxed">
+                    Kelola jadwal presensi siswa, catat jurnal mengajar harian, serta pantau aktivitas pembelajaran kelas umum dengan mudah.
+                </p>
+            </div>
+        </div>
+
+        <!-- STATS SUMMARY CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Mapel Diampu</p>
+                    <p id="stat-mapel" class="text-lg font-bold text-gray-800 mt-1">-</p>
+                </div>
+                <div class="bg-emerald-50 text-emerald-600 p-3.5 rounded-2xl">
+                    <i class="fas fa-book text-xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status Akses</p>
+                    <p class="text-lg font-bold text-emerald-600 mt-1">Aktif</p>
+                </div>
+                <div class="bg-teal-50 text-teal-600 p-3.5 rounded-2xl">
+                    <i class="fas fa-user-check text-xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tanggal Hari Ini</p>
+                    <p id="stat-date" class="text-sm font-bold text-gray-800 mt-1">-</p>
+                </div>
+                <div class="bg-blue-50 text-blue-600 p-3.5 rounded-2xl">
+                    <i class="fas fa-calendar-alt text-xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Peran Sistem</p>
+                    <p id="stat-role" class="text-lg font-bold text-gray-800 mt-1">Guru Umum</p>
+                </div>
+                <div class="bg-purple-50 text-purple-600 p-3.5 rounded-2xl">
+                    <i class="fas fa-shield-alt text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM JURNAL MENGAJAR & REKAP PRESTASI (PANEL FITUR) -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-emerald-100 text-emerald-700 p-2.5 rounded-xl">
+                        <i class="fas fa-pen-square text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Jurnal Pembelajaran Harian</h3>
+                        <p class="text-xs text-gray-500">Isi ringkasan materi dan aktivitas kelas yang Anda ampu hari ini</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="journal-form" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Pilih Kelas</label>
+                        <select id="jurnal-kelas" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                            <option value="" disabled selected>-- Pilih Kelas --</option>
+                            <option value="Kelas 7A">Kelas 7A</option>
+                            <option value="Kelas 7B">Kelas 7B</option>
+                            <option value="Kelas 8A">Kelas 8A</option>
+                            <option value="Kelas 8B">Kelas 8B</option>
+                            <option value="Kelas 9A">Kelas 9A</option>
+                            <option value="Kelas 9B">Kelas 9B</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Mata Pelajaran</label>
+                        <input type="text" id="jurnal-mapel" readonly class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm font-semibold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Jam Ke- / Pertemuan</label>
+                        <input type="text" id="jurnal-jam" placeholder="Contoh: Jam 1 - 2 (Ke-3)" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Topik & Ringkasan Materi</label>
+                    <textarea id="jurnal-materi" rows="3" required placeholder="Tuliskan materi pelajaran dan catatan aktivitas siswa..." class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></textarea>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all flex items-center text-sm">
+                        <i class="fas fa-save mr-2"></i> Simpan Jurnal
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-100 py-4 text-center text-xs text-gray-400 mt-auto">
+        &copy; 2026 SMP Muhammadiyah 2 Surabaya &bull; Portal Guru Umum
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const SUPABASE_URL = "https://ujbiawpaxdgrmgkznkef.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqYmlhd3BheGRncm1na3pua2VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MjkxMzQsImV4cCI6MjEwMjEwNTEzNH0.n6YzZlZLFQ-zG1mGeCtFJdyzVMAyxiu-6cqBioZPcMU";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+
+        // Inisialisasi Data Pengguna dari LocalStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('guru_umum_user');
+            if (stored) {
+                currentUser = JSON.parse(stored);
+                
+                // Tampilkan ke UI
+                document.getElementById('user-display-name').textContent = currentUser.name || 'Guru Umum';
+                document.getElementById('welcome-name').textContent = currentUser.name || 'Guru Umum';
+                document.getElementById('user-display-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
+                document.getElementById('stat-mapel').textContent = currentUser.mapel || 'Mata Pelajaran';
+                document.getElementById('jurnal-mapel').value = currentUser.mapel || 'Mata Pelajaran';
+
+                // Tanggal Hari Ini
+                const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+                document.getElementById('stat-date').textContent = today;
+            }
+        });
+
+        // Fungsi Logout Guru Umum
+        function logoutGuruUmum() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                localStorage.removeItem('guru_umum_user');
+                showToast('Anda telah keluar', 'info');
+                setTimeout(() => {
+                    window.location.href = 'guru_umum.html';
+                }, 800);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toast.classList.remove('hidden');
+            toastMsg.textContent = message;
+            
+            if(type === 'success') {
+                toastIcon.className = 'fas fa-check-circle text-emerald-400';
+            } else if(type === 'error') {
+                toastIcon.className = 'fas fa-exclamation-circle text-red-400';
+            } else {
+                toastIcon.className = 'fas fa-info-circle text-blue-400';
+            }
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Submit Jurnal Mengajar
+        document.getElementById('journal-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const kelas = document.getElementById('jurnal-kelas').value;
+            const materi = document.getElementById('jurnal-materi').value;
+
+            showToast(`Jurnal untuk ${kelas} berhasil disimpan!`, 'success');
+            e.target.reset();
+            document.getElementById('jurnal-mapel').value = currentUser ? currentUser.mapel : '';
+        });
+    </script>
+</body>
+</html>
