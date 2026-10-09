@@ -217,38 +217,48 @@
         // Form Submit Login Guru Umum
         document.getElementById('login-form-guru-umum').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('guru-username').value;
-            const password = document.getElementById('guru-password').value;
+            const username = document.getElementById('guru-username').value.trim();
+            const password = document.getElementById('guru-password').value.trim();
             const mapel = document.getElementById('guru-mapel').value;
-
+        
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memeriksa Akses...';
             btn.disabled = true;
-
+        
             try {
-                // Cek user dari Supabase
+                // Cek data user dari tabel 'users' di Supabase
                 const { data, error } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('username', username)
                     .eq('password', password)
                     .maybeSingle();
-
+        
                 if (error || !data) {
                     showToast('Username atau Kata Sandi salah!', 'error');
                 } else {
                     showToast(`Berhasil masuk! Selamat datang, ${data.name}`, 'success');
-                    // Simulasi redirect / simpan session
+        
+                    // Simpan session pengguna ke localStorage
+                    const userData = {
+                        username: data.username,
+                        name: data.name,
+                        role: data.role,
+                        mapel: data.mapel || mapel
+                    };
+                    localStorage.setItem('guru_umum_user', JSON.stringify(userData));
+        
+                    // Redirect ke halaman dashboard guru umum setelah 1 detik
                     setTimeout(() => {
-                        alert(`Login Berhasil!\nNama: ${data.name}\nPeran: Guru Umum\nMapel: ${mapel}`);
-                    }, 500);
+                        window.location.href = 'dashboard_guru_umum.html';
+                    }, 1000);
                 }
             } catch (err) {
                 showToast('Terjadi kesalahan koneksi database', 'error');
                 console.error(err);
             }
-
+        
             btn.innerHTML = originalText;
             btn.disabled = false;
         });
