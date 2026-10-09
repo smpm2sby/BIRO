@@ -258,7 +258,7 @@
                             
                             <div class="flex items-center space-x-2 w-full sm:w-auto">
                                 <div class="relative flex-1 sm:w-64">
-                                    <input type="text" id="guru-materi-search" oninput="filterApprovedMateriGuru()" placeholder="Cari guru, siswa, kelas, materi..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                    <input type="text" id="guru-materi-search" oninput="filterApprovedMateriGuru()" placeholder="Cari mapel, guru, siswa, materi..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                                     <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
                                 </div>
                                 <button onclick="loadApprovedMateriForGuru()" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-2 rounded-xl font-semibold transition-colors whitespace-nowrap">
@@ -504,6 +504,7 @@
                                 <thead>
                                     <tr class="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-200 font-bold">
                                         <th class="px-4 py-3">Tanggal</th>
+                                        <th class="px-4 py-3">Mata Pelajaran</th>
                                         <th class="px-4 py-3">Guru & Mapel</th>
                                         <th class="px-4 py-3">Siswa & Kelas</th>
                                         <th class="px-4 py-3">Jenis Materi</th>
@@ -514,7 +515,7 @@
                                 </thead>
                                 <tbody id="approval-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
                                     <tr>
-                                        <td colspan="7" class="px-6 py-8 text-center text-gray-400">
+                                        <td colspan="8" class="px-6 py-8 text-center text-gray-400">
                                             <i class="fas fa-spinner fa-spin mr-2"></i> Memuat daftar pengajuan materi...
                                         </td>
                                     </tr>
@@ -841,7 +842,7 @@
         // --- ADMIN PERSETUJUAN MATERI ---
         async function loadApprovalList() {
             const tbody = document.getElementById('approval-table-body');
-            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data persetujuan...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Memuat data persetujuan...</td></tr>';
 
             try {
                 const { data, error } = await supabaseClient
@@ -854,7 +855,7 @@
                 tbody.innerHTML = '';
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">Belum ada pengajuan materi dari Guru Umum.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">Belum ada pengajuan materi dari Guru Umum.</td></tr>';
                     return;
                 }
 
@@ -874,6 +875,7 @@
                     const rowHtml = `
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500 font-medium">${tgl}</td>
+                            <td class="px-4 py-3 font-bold text-xs text-emerald-700">${item.mata_pelajaran || '-'}</td>
                             <td class="px-4 py-3 font-semibold text-gray-900">${item.nama_guru_mapel || '-'}</td>
                             <td class="px-4 py-3 text-xs font-medium text-gray-800">
                                 ${item.student_name ? `${item.student_name} <br><span class="text-[11px] text-gray-400">(${item.class_name || '-'})</span>` : '-'}
@@ -901,7 +903,7 @@
 
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500 font-medium">Gagal memuat daftar pengajuan materi.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-red-500 font-medium">Gagal memuat daftar pengajuan materi.</td></tr>';
             }
         }
 
@@ -976,13 +978,14 @@
             }
 
             const filtered = approvedMateriData.filter(item => {
+                const mapel = (item.mata_pelajaran || '').toLowerCase();
                 const guruMapel = (item.nama_guru_mapel || '').toLowerCase();
                 const jenis = (item.jenis_materi || '').toLowerCase();
                 const materi = (item.materi || '').toLowerCase();
                 const student = (item.student_name || '').toLowerCase();
                 const kelas = (item.class_name || '').toLowerCase();
 
-                return guruMapel.includes(query) || jenis.includes(query) || materi.includes(query) || student.includes(query) || kelas.includes(query);
+                return mapel.includes(query) || guruMapel.includes(query) || jenis.includes(query) || materi.includes(query) || student.includes(query) || kelas.includes(query);
             });
 
             renderApprovedMateriList(filtered);
@@ -1018,6 +1021,9 @@
                                 <span class="${badgeColor} text-[11px] font-extrabold px-2.5 py-1 rounded-lg">${item.jenis_materi || 'BIRO UMUM'}</span>
                                 <span class="text-[11px] font-medium text-gray-400">${tgl}</span>
                             </div>
+                            <span class="inline-block bg-teal-50 text-teal-700 text-[10px] font-bold px-2 py-0.5 rounded border border-teal-100 mb-1">
+                                <i class="fas fa-book mr-1"></i> ${item.mata_pelajaran || '-'}
+                            </span>
                             <h4 class="font-bold text-gray-900 text-sm mb-0.5">${item.nama_guru_mapel || 'Guru Umum'}</h4>
                             <p class="text-xs text-indigo-600 font-semibold mb-2">
                                 <i class="fas fa-user-graduate mr-1"></i> ${item.student_name ? `${item.student_name} (${item.class_name || '-'})` : 'Semua Siswa'}
