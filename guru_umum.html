@@ -65,12 +65,11 @@
         </div>
     </div>
 
-    <!-- MAIN LOGIN CARD (UNIQUE GLASS & SPLIT DESIGN) -->
+    <!-- MAIN LOGIN CARD -->
     <div class="w-full max-w-4xl glass-card rounded-3xl shadow-2xl overflow-hidden relative z-10 grid grid-cols-1 md:grid-cols-12 border border-emerald-500/20 fade-in">
         
-        <!-- SIDE PANEL (LEFT / HERO BRANDING) -->
+        <!-- SIDE PANEL (LEFT) -->
         <div class="md:col-span-5 bg-gradient-to-br from-emerald-700 via-teal-800 to-emerald-950 p-8 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
-            <!-- Decorative Pattern Background -->
             <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-extrabold select-none pointer-events-none">
                 <i class="fas fa-chalkboard-teacher"></i>
             </div>
@@ -88,7 +87,6 @@
                 </p>
             </div>
 
-            <!-- Bottom Badge / Features Preview -->
             <div class="mt-8 pt-6 border-t border-emerald-600/40 space-y-3 text-xs text-emerald-100/90">
                 <div class="flex items-center space-x-2.5">
                     <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
@@ -114,14 +112,14 @@
 
             <form id="login-form-guru-umum" class="space-y-5">
                 
-                <!-- Input NIP / Username -->
+                <!-- Input Username -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">NIP / Username</label>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Username / NIP</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
                             <i class="fas fa-id-card"></i>
                         </span>
-                        <input type="text" id="guru-username" required placeholder="Masukkan NIP atau Username" 
+                        <input type="text" id="guru-username" required placeholder="Masukkan username" 
                             class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm font-medium">
                     </div>
                 </div>
@@ -139,21 +137,6 @@
                             <i id="eye-icon" class="fas fa-eye"></i>
                         </button>
                     </div>
-                </div>
-
-                <!-- Option Mata Pelajaran (Optional Filter Preview) -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Mata Pelajaran Utama</label>
-                    <select id="guru-mapel" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm font-medium text-gray-700">
-                        <option value="Umum">Mata Pelajaran Umum / Kelas</option>
-                        <option value="Informatika">Informatika / TIK</option>
-                        <option value="Matematika">Matematika</option>
-                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                        <option value="IPA">IPA (Sains)</option>
-                        <option value="IPS">IPS</option>
-                        <option value="Bahasa Inggris">Bahasa Inggris</option>
-                        <option value="Lainnya">Lainnya...</option>
-                    </select>
                 </div>
 
                 <!-- Tombol Submit Login -->
@@ -219,7 +202,6 @@
             e.preventDefault();
             const username = document.getElementById('guru-username').value.trim();
             const password = document.getElementById('guru-password').value.trim();
-            const mapel = document.getElementById('guru-mapel').value;
         
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
@@ -240,16 +222,16 @@
                 } else {
                     showToast(`Berhasil masuk! Selamat datang, ${data.name}`, 'success');
         
-                    // Simpan session pengguna ke localStorage
+                    // Simpan session pengguna ke localStorage (mengambil mapel langsung dari DB)
                     const userData = {
                         username: data.username,
                         name: data.name,
                         role: data.role,
-                        mapel: data.mapel || mapel
+                        mapel: data.mapel || '-'
                     };
                     localStorage.setItem('guru_umum_user', JSON.stringify(userData));
         
-                    // Redirect ke halaman dashboard guru umum setelah 1 detik
+                    // Redirect ke dashboard guru umum setelah 1 detik
                     setTimeout(() => {
                         window.location.href = 'dashboard_guru_umum.html';
                     }, 1000);
